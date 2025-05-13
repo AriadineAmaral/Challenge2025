@@ -1,4 +1,6 @@
 // lib/screens/login_screen.dart
+import 'package:europro/screens/access_screen.dart';
+import 'package:europro/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/button.dart';
 
@@ -22,10 +24,16 @@ class EuroProLoginScreen extends StatelessWidget {
               SizedBox(height: 80),
               Button(
                 text: 'Acessar conta',
-                backgroundColor:const Color(0xFF00358E),
-                textColor: Colors.white,
-                onPressed: () {},
+                backgroundColor:const Color(0xFFFFF200),
+                textColor: Colors.black,
+                onPressed: () {
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(builder: (context) => const AccessScreen()),
+                    );
+                },
               ),
+              
               SizedBox(height: 16),
               Align(
                 alignment: Alignment.centerLeft,
@@ -35,12 +43,15 @@ class EuroProLoginScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 8),
-              Button(
+              Button(             
                 text: 'Criar conta',
-                backgroundColor:const Color(0xFFFFF200),
-                textColor: Colors.black,
+                backgroundColor:const Color(0xFF00358E),
+                textColor: Colors.white,
                 isBold: true,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpScreen()),
+                  );
+                },
               ),
             ],
           ),
