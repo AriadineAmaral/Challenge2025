@@ -1,0 +1,144 @@
+import 'package:europro/widgets/button.dart';
+import 'package:flutter/material.dart';
+
+class AccessScreen extends StatefulWidget {
+  const AccessScreen({super.key});
+
+  @override
+  State<AccessScreen> createState() => _AccessScreenState();
+}
+
+class _AccessScreenState extends State<AccessScreen> {
+  bool _esconderSenha = true;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24.0,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RichText(
+                textAlign: TextAlign.center, 
+                text: TextSpan(
+                  style: TextStyle(fontSize: 45, color: Colors.black),
+                  children: <TextSpan>[
+                    TextSpan(text: 'Bem-Vindo(a)\n ao '),
+                    TextSpan(
+                      text: 'EuroPro',
+                      style: TextStyle(color: Color(0xFF00358E)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40), 
+              // Campo Email
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Email',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Email',
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF00358E),
+                            width: 2.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Campo Senha
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Senha',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      obscureText: _esconderSenha,
+                      decoration: InputDecoration(
+                        hintText: 'Senha',
+                        border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _esconderSenha = !_esconderSenha;
+                            });
+                          },
+                          icon: Icon(
+                            _esconderSenha
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF00358E),
+                            width: 2.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Link "Esqueceu sua senha?"
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'Esqueceu sua senha?',
+                    style: TextStyle(color: Color(0xFF00358E)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Botão Entrar
+              Button(
+                text: 'Entrar',
+                backgroundColor: const Color(0xFFFFF200),
+                textColor: Colors.black,
+                isBold: true,
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

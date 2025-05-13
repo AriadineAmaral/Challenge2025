@@ -70,7 +70,6 @@ Widget build(BuildContext context) {
                         .then(delay: 200.ms)
                         .slideX(end: -2.0, duration: 800.ms, curve: Curves.easeInBack)
                         .fadeOut(duration: 500.ms)
-                        .shake(hz: 3)
                         .blurXY(end: 10.0),
                   ],
                 ),
