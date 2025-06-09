@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:europro/config/supabase.dart';
 import 'package:europro/login_screens/initial_screen.dart';
 import 'package:flutter/material.dart';
