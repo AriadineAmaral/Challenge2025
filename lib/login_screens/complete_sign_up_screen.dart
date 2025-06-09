@@ -1,5 +1,4 @@
-import 'package:europro/screens/access_screen.dart';
-import 'package:europro/screens/login_screen.dart';
+import 'package:europro/login_screens/access_screen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -12,7 +11,6 @@ class CompleteSignUpScreen extends StatefulWidget {
 }
 
 class _AccessScreenState extends State<CompleteSignUpScreen> {
-  bool _esconderSenha = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

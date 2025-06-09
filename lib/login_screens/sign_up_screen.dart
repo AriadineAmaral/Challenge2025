@@ -1,4 +1,4 @@
-import 'package:europro/screens/complete_sign_up_screen.dart';
+import 'package:europro/login_screens/complete_sign_up_screen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
 
@@ -157,50 +157,50 @@ class _AccessScreenState extends State<SignUpScreen> {
                   ],
                 ),
               ),
-               const SizedBox(height: 2),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'CPF',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),   
-                          TextField(
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              hintText: 'Digite seu CPF',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                        ],
+              const SizedBox(height: 2),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'CPF',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    // Botão Entrar
-                    Button(
-                      text: 'Criar conta',
-                      backgroundColor: const Color(0xFF00358E),
-                      textColor: Colors.white,
-                      isBold: true,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CompleteSignUpScreen(),
-                          ),
-                        );
-                      },
+                    const SizedBox(height: 5),
+                    TextField(
+                      obscureText: false,
+                      decoration: InputDecoration(
+                        hintText: 'Digite seu CPF',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 10),
+              // Botão Entrar
+              Button(
+                text: 'Criar conta',
+                backgroundColor: const Color(0xFF00358E),
+                textColor: Colors.white,
+                isBold: true,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CompleteSignUpScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
