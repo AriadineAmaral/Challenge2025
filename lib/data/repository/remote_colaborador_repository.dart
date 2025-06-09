@@ -8,11 +8,6 @@ class RemoteColaboradorRepository implements ColaboradorRepository {
   RemoteColaboradorRepository({required this.client});
 
   @override
-  Future<void> addColaborador(Colaborador colaborador)async {
-    await client.from('colaboradores').insert([colaborador.toMap()]);
-  }
-
-  @override
   Future<List<Colaborador>> listColaborador() async{
   final result = await client.from('colaboradores').select();
     final colaboradores = result.map((e) => Colaborador.fromMap(e)).toList();
