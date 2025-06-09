@@ -1,3 +1,4 @@
+import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
 
@@ -21,14 +22,12 @@ class _AccessScreenState extends State<AccessScreen> {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24.0,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               RichText(
-                textAlign: TextAlign.center, 
+                textAlign: TextAlign.center,
                 text: TextSpan(
                   style: TextStyle(fontSize: 45, color: Colors.black),
                   children: <TextSpan>[
@@ -40,7 +39,7 @@ class _AccessScreenState extends State<AccessScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 40), 
+              const SizedBox(height: 40),
               // Campo Email
               Align(
                 alignment: Alignment.centerLeft,
@@ -133,7 +132,14 @@ class _AccessScreenState extends State<AccessScreen> {
                 backgroundColor: const Color(0xFFFFF200),
                 textColor: Colors.black,
                 isBold: true,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RankingScreen(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
