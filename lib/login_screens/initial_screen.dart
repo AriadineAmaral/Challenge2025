@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:europro/screens/login_screen.dart';
+import 'package:europro/login_screens/login_screen.dart';
 
 class InitialScreen extends StatefulWidget {
   const InitialScreen({super.key});

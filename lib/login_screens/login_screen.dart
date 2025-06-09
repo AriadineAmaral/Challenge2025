@@ -1,6 +1,6 @@
 // lib/screens/login_screen.dart
-import 'package:europro/screens/access_screen.dart';
-import 'package:europro/screens/sign_up_screen.dart';
+import 'package:europro/login_screens/access_screen.dart';
+import 'package:europro/login_screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/button.dart';
 

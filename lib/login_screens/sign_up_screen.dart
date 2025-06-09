@@ -1,4 +1,4 @@
-import 'package:europro/screens/complete_sign_up_screen.dart';
+import 'package:europro/login_screens/complete_sign_up_screen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
 
