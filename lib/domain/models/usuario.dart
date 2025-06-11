@@ -1,12 +1,12 @@
 class Usuario {
   final int? idUsuario;
-  final int idColaborador;
+  final int? idColaborador;
   final String email;
   final String senha;
 
   Usuario({
     this.idUsuario,
-    required this.idColaborador,
+    this.idColaborador,
     required this.email,
     required this.senha,
   });

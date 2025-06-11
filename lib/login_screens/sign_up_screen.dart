@@ -1,6 +1,10 @@
+import 'package:europro/data/repository/controller/signup_controllers.dart';
+import 'package:europro/data/repository/remote_usuario_repository.dart';
+import 'package:europro/domain/models/usuario.dart';
 import 'package:europro/login_screens/complete_sign_up_screen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -10,7 +14,16 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _AccessScreenState extends State<SignUpScreen> {
+
+  final SignUpControllers _controllers = SignUpControllers();
   bool _esconderSenha = true;
+
+  @override
+  void dispose() {
+    _controllers.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,6 +68,7 @@ class _AccessScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 5),
                     TextField(
+                      controller: _controllers.emailController,
                       decoration: InputDecoration(
                         hintText: 'Email',
                         border: OutlineInputBorder(),
@@ -85,6 +99,7 @@ class _AccessScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 5),
                     TextField(
+                      controller: _controllers.senhaController,
                       obscureText: _esconderSenha,
                       decoration: InputDecoration(
                         hintText: 'Crie uma senha',
@@ -129,6 +144,7 @@ class _AccessScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 5),
                     TextField(
+                      controller: _controllers.confirmarSenhaController,
                       obscureText: _esconderSenha,
                       decoration: InputDecoration(
                         hintText: 'Repita a senha',
@@ -172,6 +188,7 @@ class _AccessScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: 5),
                     TextField(
+                      controller: _controllers.cpfController,
                       obscureText: false,
                       decoration: InputDecoration(
                         hintText: 'Digite seu CPF',
@@ -188,13 +205,51 @@ class _AccessScreenState extends State<SignUpScreen> {
                 backgroundColor: const Color(0xFF00358E),
                 textColor: Colors.white,
                 isBold: true,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CompleteSignUpScreen(),
-                    ),
-                  );
+                onPressed: () async {
+                  final email = _controllers.emailController.text.trim();
+                  final senha = _controllers.senhaController.text.trim();
+                  final confirmarSenha = _controllers.confirmarSenhaController.text.trim();
+                  final cpf = _controllers.cpfController.text.replaceAll(RegExp(r'\D'), '').trim();
+
+                  if (email.isEmpty || senha.isEmpty || confirmarSenha.isEmpty || cpf.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Por favor, preencha todos os campos')),
+                    );
+                    return;
+                  }
+
+                  if (senha != confirmarSenha) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('As senhas não coincidem')),
+                    );
+                    return;
+                  }
+
+                  try {
+                    final usuarioRepo = RemoteUsuarioRepository(client: Supabase.instance.client);
+
+                    final novoUsuario = Usuario(
+                      idColaborador: null, 
+                      email: email,
+                      senha: senha,
+                    );
+
+                    await usuarioRepo.addUsuario(novoUsuario, cpf);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Usuário criado com sucesso')),
+                    );
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CompleteSignUpScreen()),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Erro: ${e.toString()}')),
+                    );
+                  }
+
                 },
               ),
             ],
