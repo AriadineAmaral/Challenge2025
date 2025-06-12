@@ -1,16 +1,21 @@
-import 'package:europro/config/dependencies.dart';
-import 'package:europro/config/supabase.dart';
 import 'package:europro/login_screens/initial_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
-  await SupabaseConfig.init();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: 'https://ikxlfarvmokiwjfqqial.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlreGxmYXJ2bW9raXdqZnFxaWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkxNzAxOTUsImV4cCI6MjA2NDc0NjE5NX0.0b4EJzlHDDTD3m9pjYAVcjLNoOqjWWQJVw2WWBUb8dg',
+  );
 
-  print('URL do Supabase carregada: ${const String.fromEnvironment('SUPABASE_URL')}');
-  print('Chave do Supabase carregada: ${const String.fromEnvironment('SUPABASE_KEY')}');
-  runApp(MultiProvider(providers: providersLocal, child: const EuroProApp()));
-  
+  // print(
+  //   'URL do Supabase carregada: ${const String.fromEnvironment('SUPABASE_URL')}',
+  // );
+  // print(
+  //   'Chave do Supabase carregada: ${const String.fromEnvironment('SUPABASE_KEY')}',
+  // );
+  runApp(const EuroProApp());
 }
 
 class EuroProApp extends StatelessWidget {

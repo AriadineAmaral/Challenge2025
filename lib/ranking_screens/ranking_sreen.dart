@@ -1,5 +1,8 @@
+import 'package:europro/data/repository/remote_colaborador_repository.dart';
+import 'package:europro/domain/models/colaborador.dart';
 import 'package:flutter/material.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RankingScreen extends StatefulWidget {
   const RankingScreen({super.key});
@@ -9,38 +12,35 @@ class RankingScreen extends StatefulWidget {
 }
 
 class _RankingScreenState extends State<RankingScreen> {
-  final List<Map<String, dynamic>> colaboradores = [
-    {
-      "nome": "Ana Júlia Souza",
-      "pontuacao": "249 pts",
-      "imagem": "assets/ana.png",
-    },
-    {
-      "nome": "Maria Fernandes",
-      "pontuacao": "193 pts",
-      "imagem": "assets/maria.png",
-    },
-    {
-      "nome": "Marcos Vinicius Almeida",
-      "pontuacao": "152 pts",
-      "imagem": "assets/marcos.png",
-    },
-    {
-      "nome": "Ricardo Oliveira",
-      "pontuacao": "135 pts",
-      "imagem": "assets/ricardo.png",
-    },
-    {
-      "nome": "João Pedro Santos",
-      "pontuacao": "117 pts",
-      "imagem": "assets/joao.png",
-    },
-    {
-      "nome": "Larissa Rodrigues",
-      "pontuacao": "102 pts",
-      "imagem": "assets/larissa.png",
-    },
-  ];
+
+  final colaboradorRepo = RemoteColaboradorRepository(
+                      client: Supabase.instance.client,
+  );
+
+  List<Colaborador> colaboradores = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _findColaboradores();
+  }
+  
+   Future<void> _findColaboradores() async {
+    try {
+      final resultado = await colaboradorRepo.listRankingColaborador();
+      setState(() {
+        colaboradores = resultado;
+        isLoading = false;
+      });
+    } catch (e) {
+      //print("Erro ao buscar colaboradores: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  
 
   Widget _getMedal(int index) {
     switch (index) {
@@ -121,23 +121,22 @@ class _RankingScreenState extends State<RankingScreen> {
                       children: [
                         CircleAvatar(
                           radius: 20,
-                          backgroundImage: AssetImage(
-                            colaboradores[index]["imagem"] ??
-                                'assets/placeholder.png',
-                          ),
+                          // backgroundImage: AssetImage(
+                          //   colaboradores[index]["imagem"] ??
+                          //       'assets/placeholder.png',
+                          // ),
                         ),
                         SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            colaboradores[index]["nome"] ??
-                                "Nome não disponível",
+                            colaboradores[index].nome,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
                         ),
                         _getMedal(index),
                         SizedBox(width: 12),
-                        Text("${colaboradores[index]["pontuacao"] ?? "0"}"),
+                        Text("${colaboradores[index].pontuacao}"),
                       ],
                     ),
                   );
@@ -208,41 +207,43 @@ class _RankingScreenState extends State<RankingScreen> {
               SizedBox(height: 32),
 
               // NOVAEURO
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Color(0xFF00358E),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "#INOVAEURO Transforme ideias em recompensas!",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+              Center(
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF00358E),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "#INOVAEURO Transforme ideias em recompensas!",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 12),
-                    Text(
-                      "Suas ideias podem valer muito! Participe dos programas de inovação, concorra a brindes e ganhe prêmios em dinheiro.",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Implementar navegação
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Color(0xFF00358E),
-                        minimumSize: Size(double.infinity, 48),
+                      SizedBox(height: 12),
+                      Text(
+                        "Suas ideias podem valer muito! Participe dos programas de inovação, concorra a brindes e ganhe prêmios em dinheiro.",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
-                      child: Text("Conheça nossos projetos"),
-                    ),
-                  ],
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Implementar navegação
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Color(0xFF00358E),
+                          minimumSize: Size(double.infinity, 48),
+                        ),
+                        child: Text("Conheça nossos projetos"),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

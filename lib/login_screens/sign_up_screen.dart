@@ -14,7 +14,6 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _AccessScreenState extends State<SignUpScreen> {
-
   final SignUpControllers _controllers = SignUpControllers();
   bool _esconderSenha = true;
 
@@ -208,48 +207,76 @@ class _AccessScreenState extends State<SignUpScreen> {
                 onPressed: () async {
                   final email = _controllers.emailController.text.trim();
                   final senha = _controllers.senhaController.text.trim();
-                  final confirmarSenha = _controllers.confirmarSenhaController.text.trim();
-                  final cpf = _controllers.cpfController.text.replaceAll(RegExp(r'\D'), '').trim();
+                  final confirmarSenha =
+                      _controllers.confirmarSenhaController.text.trim();
+                  final cpf =
+                      _controllers.cpfController.text
+                          .replaceAll(RegExp(r'\D'), '')
+                          .trim();
 
-                  if (email.isEmpty || senha.isEmpty || confirmarSenha.isEmpty || cpf.isEmpty) {
+                  if (email.isEmpty ||
+                      senha.isEmpty ||
+                      confirmarSenha.isEmpty ||
+                      cpf.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Por favor, preencha todos os campos')),
+                      const SnackBar(
+                        content: Text(
+                          '⚠️ Por favor, preencha todos os campos',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        backgroundColor: Color(0xFFFFF200),
+                      ),
                     );
                     return;
                   }
 
                   if (senha != confirmarSenha) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('As senhas não coincidem')),
+                      const SnackBar(
+                        content: Text(
+                          '⚠️ As senhas não coincidem',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        backgroundColor: Color(0xFFFFF200),
+                      ),
                     );
                     return;
                   }
 
                   try {
-                    final usuarioRepo = RemoteUsuarioRepository(client: Supabase.instance.client);
+                    final usuarioRepo = RemoteUsuarioRepository(
+                      client: Supabase.instance.client,
+                    );
 
                     final novoUsuario = Usuario(
-                      idColaborador: null, 
+                      idColaborador: null,
                       email: email,
                       senha: senha,
                     );
 
                     await usuarioRepo.addUsuario(novoUsuario, cpf);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Usuário criado com sucesso')),
-                    );
-
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CompleteSignUpScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => CompleteSignUpScreen(),
+                      ),
                     );
                   } catch (e) {
+                    String mensagemErro = e.toString().replaceAll(
+                      'Exception: ',
+                      '',
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Erro: ${e.toString()}')),
+                      SnackBar(
+                        content: Text(
+                        mensagemErro,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
                     );
                   }
-
                 },
               ),
             ],

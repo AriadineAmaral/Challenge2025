@@ -1,6 +1,8 @@
+import 'package:europro/data/repository/controller/access_controllers.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
+
 
 class AccessScreen extends StatefulWidget {
   const AccessScreen({super.key});
@@ -10,6 +12,7 @@ class AccessScreen extends StatefulWidget {
 }
 
 class _AccessScreenState extends State<AccessScreen> {
+  final AccessControllers _controllers = AccessControllers();
   bool _esconderSenha = true;
   @override
   Widget build(BuildContext context) {
@@ -55,6 +58,7 @@ class _AccessScreenState extends State<AccessScreen> {
                     ),
                     const SizedBox(height: 10),
                     TextField(
+                      controller: _controllers.emailController,
                       decoration: InputDecoration(
                         hintText: 'Email',
                         border: OutlineInputBorder(),
@@ -85,6 +89,7 @@ class _AccessScreenState extends State<AccessScreen> {
                     ),
                     const SizedBox(height: 10),
                     TextField(
+                      controller: _controllers.senhaController,
                       obscureText: _esconderSenha,
                       decoration: InputDecoration(
                         hintText: 'Senha',
@@ -132,13 +137,54 @@ class _AccessScreenState extends State<AccessScreen> {
                 backgroundColor: const Color(0xFFFFF200),
                 textColor: Colors.black,
                 isBold: true,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RankingScreen(),
-                    ),
-                  );
+                onPressed: () async {
+                  // final email = _controllers.emailController.text.trim();
+                  // final senha = _controllers.senhaController.text.trim();
+
+                  // if (email.isEmpty || senha.isEmpty) {
+                  //   ScaffoldMessenger.of(context).showSnackBar(
+                  //     const SnackBar(
+                  //       content: Text('⚠️ Por favor, preencha todos os campos',
+                  //        style: TextStyle(color: Colors.black),
+                  //       ),
+                  //       backgroundColor: Color(0xFFFFF200),
+                  //     ),
+                  //   );
+                  //   return;
+                  // }
+
+                  // try {
+                  //   final usuarioRepo = RemoteUsuarioRepository(
+                  //     client: Supabase.instance.client,
+                  //   );
+
+                  //   bool result = await usuarioRepo.findLoginUsuario(
+                  //     email,
+                  //     senha,
+                  //   );
+
+                  //   if (result) {
+                       Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RankingScreen(),
+                      ),
+                    );
+                  //   }
+                   
+                  // } catch (e) {
+                  //   String mensagemErro = e.toString().replaceAll(
+                  //     'Exception: ',
+                  //     '',
+                  //   );
+                  //   ScaffoldMessenger.of(context).showSnackBar(
+                  //     SnackBar(content: Text(mensagemErro,
+                  //     style: TextStyle(color: Colors.white),
+                  //       ),
+                  //       backgroundColor: Colors.red,
+                  //     ),
+                  //   );
+                  // }
                 },
               ),
             ],
