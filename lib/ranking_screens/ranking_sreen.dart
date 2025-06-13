@@ -1,5 +1,7 @@
 import 'package:europro/data/repository/remote_colaborador_repository.dart';
 import 'package:europro/domain/models/colaborador.dart';
+import 'package:europro/widgets/button.dart';
+import 'package:europro/widgets/projects.dart';
 import 'package:flutter/material.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,9 +14,8 @@ class RankingScreen extends StatefulWidget {
 }
 
 class _RankingScreenState extends State<RankingScreen> {
-
   final colaboradorRepo = RemoteColaboradorRepository(
-                      client: Supabase.instance.client,
+    client: Supabase.instance.client,
   );
 
   List<Colaborador> colaboradores = [];
@@ -25,8 +26,8 @@ class _RankingScreenState extends State<RankingScreen> {
     super.initState();
     _findColaboradores();
   }
-  
-   Future<void> _findColaboradores() async {
+
+  Future<void> _findColaboradores() async {
     try {
       final resultado = await colaboradorRepo.listRankingColaborador();
       setState(() {
@@ -40,7 +41,6 @@ class _RankingScreenState extends State<RankingScreen> {
       });
     }
   }
-  
 
   Widget _getMedal(int index) {
     switch (index) {
@@ -69,8 +69,8 @@ class _RankingScreenState extends State<RankingScreen> {
         scrolledUnderElevation: 0,
         title: Image.asset(
           'images/logoEuroPro.png',
-          height: 40, // Ajuste conforme necessário
-        ), 
+          height: 40,
+        ),
       ),
       drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
@@ -78,6 +78,7 @@ class _RankingScreenState extends State<RankingScreen> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
+              
               // Título centralizado
               Center(
                 child: Text(
@@ -110,38 +111,40 @@ class _RankingScreenState extends State<RankingScreen> {
               ),
               Divider(thickness: 2),
               // Lista de colaboradores
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: colaboradores.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          // backgroundImage: AssetImage(
-                          //   colaboradores[index]["imagem"] ??
-                          //       'assets/placeholder.png',
-                          // ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            colaboradores[index].nome,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+              // Lista de colaboradores com rolagem própria
+              Container(
+                height: 300, // Aproximadamente 6 itens visíveis
+                child: ListView.builder(
+                  itemCount: colaboradores.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            // backgroundImage: AssetImage(
+                            //   colaboradores[index]["imagem"] ?? 'assets/placeholder.png',
+                            // ),
                           ),
-                        ),
-                        _getMedal(index),
-                        SizedBox(width: 12),
-                        Text("${colaboradores[index].pontuacao}"),
-                      ],
-                    ),
-                  );
-                },
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              colaboradores[index].nome,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          _getMedal(index),
+                          SizedBox(width: 12),
+                          Text("${colaboradores[index].pontuacao}"),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
+
               SizedBox(height: 24),
               // Missões do mês
               Container(
@@ -149,6 +152,14 @@ class _RankingScreenState extends State<RankingScreen> {
                 decoration: BoxDecoration(
                   color: Color(0xFF00358E),
                   borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey,
+                      spreadRadius: 0,
+                      blurRadius: 1,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +202,7 @@ class _RankingScreenState extends State<RankingScreen> {
                     SizedBox(height: 12),
                     LinearProgressIndicator(
                       value: progresso, // entre 0.0 e 1.0
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: Color(0x4D0000FF),
                       color: Colors.yellowAccent,
                       minHeight: 10,
                     ),
@@ -211,36 +222,64 @@ class _RankingScreenState extends State<RankingScreen> {
                 child: Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Color(0xFF00358E),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFF9E9E9E),
+                        spreadRadius: 0,
+                        blurRadius: 3,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "#INOVAEURO Transforme ideias em recompensas!",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "#INOVAEURO",
+                              style: TextStyle(color: Color(0xFF00358E)),
+                            ),
+                            TextSpan(
+                              text: " Transforme ideias em recompensas!",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ],
                         ),
                       ),
                       SizedBox(height: 12),
-                      Text(
-                        "Suas ideias podem valer muito! Participe dos programas de inovação, concorra a brindes e ganhe prêmios em dinheiro.",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      RichText(
+                        text: TextSpan(
+                          style: TextStyle(fontSize: 16),
+                          children: [
+                            TextSpan(
+                              text: "Suas ideias podem valer muito! ",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            TextSpan(
+                              text:
+                                  "Participe dos programas de inovação, concorra a brindes e ganhe prêmios em dinheiro.",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ],
+                        ),
                       ),
                       SizedBox(height: 16),
-                      ElevatedButton(
+                      Button(
+                        text: 'Conheça nossos projetos',
+                        backgroundColor: Colors.yellow,
+                        textColor: Colors.black,
                         onPressed: () {
-                          // Implementar navegação
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Projects())
+                          );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Color(0xFF00358E),
-                          minimumSize: Size(double.infinity, 48),
-                        ),
-                        child: Text("Conheça nossos projetos"),
                       ),
                     ],
                   ),

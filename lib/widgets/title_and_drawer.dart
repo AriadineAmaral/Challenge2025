@@ -1,5 +1,6 @@
 // title_drawer_widget.dart
 import 'package:europro/login_screens/login_screen.dart';
+import 'package:europro/widgets/my_projects.dart';
 import 'package:flutter/material.dart';
 
 class TitleAndDrawer extends StatelessWidget {
@@ -100,7 +101,14 @@ class TitleAndDrawer extends StatelessWidget {
                   child: ListTile(
                     leading: Icon(Icons.snippet_folder_rounded),
                     title: Text('Meus projetos'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MyProjects(),
+                                ),
+                              );
+                    },
                   ),
                 ),
                 Padding(

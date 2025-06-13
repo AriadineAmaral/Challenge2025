@@ -270,7 +270,7 @@ class _AccessScreenState extends State<SignUpScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                        mensagemErro,
+                          mensagemErro,
                           style: TextStyle(color: Colors.white),
                         ),
                         backgroundColor: Colors.red,

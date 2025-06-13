@@ -50,61 +50,66 @@ class _InitialScreenState extends State<InitialScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: const Color(0xFF00358E),
-    body: Stack(
-      children: [
-        // Conteúdo principal centralizado
-        Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: SizedBox(
-                width: 250,
-                height: 100,
-                child: Stack(
-                  children: [
-                    _buildLogoSlice(0.3, 600.ms)
-                        .animate(target: _startExitAnimation ? 1 : 0)
-                        .then(delay: 200.ms)
-                        .slideX(end: -2.0, duration: 800.ms, curve: Curves.easeInBack)
-                        .fadeOut(duration: 500.ms)
-                        .blurXY(end: 10.0),
-                  ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF00358E),
+      body: Stack(
+        children: [
+          // Conteúdo principal centralizado
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: SizedBox(
+                  width: 250,
+                  height: 100,
+                  child: Stack(
+                    children: [
+                      _buildLogoSlice(0.3, 600.ms)
+                          .animate(target: _startExitAnimation ? 1 : 0)
+                          .then(delay: 200.ms)
+                          .slideX(
+                            end: -2.0,
+                            duration: 800.ms,
+                            curve: Curves.easeInBack,
+                          )
+                          .fadeOut(duration: 500.ms)
+                          .blurXY(end: 10.0),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
 
-        // Imagem no rodapé (garantido)
-        if (_startExitAnimation)
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 40),
-              child: Image.asset(
-                'images/logoEuroFarma.png',
-                width: 200,
-                height: 80,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Container(
-                  width: 200,
-                  height: 80,
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.image, size: 40),
-                ),
-              )
-              .animate()
-              .fadeIn(duration: 300.ms)
-              .slideY(begin: 0.5, end: 0.0),
+          // Imagem no rodapé (garantido)
+          if (_startExitAnimation)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 40),
+                child: Image.asset(
+                      'images/logoEuroFarma.png',
+                      width: 200,
+                      height: 80,
+                      fit: BoxFit.contain,
+                      errorBuilder:
+                          (_, __, ___) => Container(
+                            width: 200,
+                            height: 80,
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.image, size: 40),
+                          ),
+                    )
+                    .animate()
+                    .fadeIn(duration: 300.ms)
+                    .slideY(begin: 0.5, end: 0.0),
+              ),
             ),
-          ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   Widget _buildLogoSlice(double widthFactor, Duration delay) {
     return Positioned.fill(
