@@ -1,5 +1,7 @@
 import 'package:europro/data/repository/remote_colaborador_repository.dart';
 import 'package:europro/domain/models/colaborador.dart';
+import 'package:europro/notification_screens/notification_screen.dart';
+import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:europro/widgets/projects.dart';
 import 'package:flutter/material.dart';
@@ -67,10 +69,7 @@ class _RankingScreenState extends State<RankingScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
-        title: Image.asset(
-          'images/logoEuroPro.png',
-          height: 40,
-        ),
+        title: Image.asset('images/logoEuroPro.png', height: 40),
       ),
       drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
@@ -78,7 +77,6 @@ class _RankingScreenState extends State<RankingScreen> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
-              
               // Título centralizado
               Center(
                 child: Text(
@@ -179,15 +177,24 @@ class _RankingScreenState extends State<RankingScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            // Ação ao clicar no botão
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NotificationScreen(),
+                              ),
+                            );
                           },
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text("Ver missões"),
+                              Text(
+                                "Ver missões",
+                                style: TextStyle(color: Colors.white),
+                              ),
                               SizedBox(width: 4),
                               Icon(
                                 Icons.arrow_forward_ios,
@@ -205,6 +212,7 @@ class _RankingScreenState extends State<RankingScreen> {
                       backgroundColor: Color(0x4D0000FF),
                       color: Colors.yellowAccent,
                       minHeight: 10,
+                      borderRadius: BorderRadius.circular(5),
                     ),
                     SizedBox(height: 8),
                     Text(
@@ -277,7 +285,11 @@ class _RankingScreenState extends State<RankingScreen> {
                         backgroundColor: Colors.yellow,
                         textColor: Colors.black,
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const Projects())
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Projects(),
+                            ),
                           );
                         },
                       ),
@@ -289,6 +301,62 @@ class _RankingScreenState extends State<RankingScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: Container(
+        height: 50,
+        color: Color(0xFF00358E),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Botão Notificações
+            _buildSimpleNavIcon(
+              icon: Icons.notifications_none,
+              onPressed:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotificationScreen(),
+                    ),
+                  ),
+            ),
+
+            // Botão Home
+            _buildSimpleNavIcon(
+              icon: Icons.home_outlined,
+              onPressed:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RankingScreen()),
+                  ),
+            ),
+
+            // Botão Perfil
+            _buildSimpleNavIcon(
+              icon: Icons.person_outline,
+              onPressed:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PerfilScreen()),
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSimpleNavIcon({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return IconButton(
+      icon: Icon(icon, color: Colors.white),
+      iconSize: 25, // Tamanho fixo (ajuste conforme necessário)
+      padding: EdgeInsets.symmetric(
+        horizontal: 25,
+        vertical: 10,
+      ), // Espaçamento interno
+      constraints: BoxConstraints(), // Remove restrições de tamanho padrão
+      onPressed: onPressed,
     );
   }
 }

@@ -1,4 +1,7 @@
-import 'package:europro/widgets/detail_projects.dart';
+import 'package:europro/notification_screens/notification_screen.dart';
+import 'package:europro/perfil_screens/perfil_screen.dart';
+import 'package:europro/projects_screens/detail_projects_screen.dart';
+import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:flutter/material.dart';
 
 class MyProjects extends StatefulWidget {
@@ -11,22 +14,10 @@ class MyProjects extends StatefulWidget {
 class _MeusProjetosScreenState extends State<MyProjects> {
   // Lista de projetos (será populada quando enviar da outra tela)
   final List<Projeto> _projetos = [
-    Projeto(
-      nome: 'Projeto Kaizen',
-      status: 'análise e seleção',
-    ),
-    Projeto(
-      nome: 'Projeto Clic',
-      status: 'desenvolvimento',
-    ),
-    Projeto(
-      nome: 'Projeto Kaizen',
-      status: 'finalizado',
-    ),
-    Projeto(
-      nome: 'Projeto Kaizen',
-      status: 'finalizado',
-    ),
+    Projeto(nome: 'Projeto Kaizen', status: 'análise e seleção'),
+    Projeto(nome: 'Projeto Clic', status: 'desenvolvimento'),
+    Projeto(nome: 'Projeto Kaizen', status: 'finalizado'),
+    Projeto(nome: 'Projeto Kaizen', status: 'finalizado'),
   ];
 
   @override
@@ -50,7 +41,7 @@ class _MeusProjetosScreenState extends State<MyProjects> {
             Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.black),
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
                   onPressed: () => Navigator.pop(context),
                 ),
                 const Expanded(
@@ -92,11 +83,67 @@ class _MeusProjetosScreenState extends State<MyProjects> {
           ],
         ),
       ),
+      bottomNavigationBar: Container(
+        height: 50,
+        color: Color(0xFF00358E),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Botão Notificações
+            _buildSimpleNavIcon(
+              icon: Icons.notifications_none,
+              onPressed:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotificationScreen(),
+                    ),
+                  ),
+            ),
+
+            // Botão Home
+            _buildSimpleNavIcon(
+              icon: Icons.home_outlined,
+              onPressed:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RankingScreen()),
+                  ),
+            ),
+
+            // Botão Perfil
+            _buildSimpleNavIcon(
+              icon: Icons.person_outline,
+              onPressed:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PerfilScreen()),
+                  ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-//Classe para criar os dados mockados 
+Widget _buildSimpleNavIcon({
+  required IconData icon,
+  required VoidCallback onPressed,
+}) {
+  return IconButton(
+    icon: Icon(icon, color: Colors.white),
+    iconSize: 25, // Tamanho fixo (ajuste conforme necessário)
+    padding: EdgeInsets.symmetric(
+      horizontal: 25,
+      vertical: 10,
+    ), // Espaçamento interno
+    constraints: BoxConstraints(), // Remove restrições de tamanho padrão
+    onPressed: onPressed,
+  );
+}
+
+//Classe para criar os dados mockados
 
 class _ProjetoCard extends StatelessWidget {
   final Projeto projeto;
@@ -112,8 +159,16 @@ class _ProjetoCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0xFF9E9E9E),
+              spreadRadius: 0,
+              blurRadius: 3,
+              offset: Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,7 +179,11 @@ class _ProjetoCard extends StatelessWidget {
               children: [
                 Text(
                   projeto.nome,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF00358E)),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF00358E),
+                  ),
                 ),
                 const Icon(Icons.chevron_right, color: Colors.grey),
               ],

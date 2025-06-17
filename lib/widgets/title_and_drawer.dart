@@ -1,6 +1,9 @@
 // title_drawer_widget.dart
 import 'package:europro/login_screens/login_screen.dart';
-import 'package:europro/widgets/my_projects.dart';
+import 'package:europro/mission_screens/missions_screen.dart';
+import 'package:europro/perfil_screens/perfil_screen.dart';
+import 'package:europro/projects_screens/my_projects_screen.dart';
+import 'package:europro/rewards_and_missions_screens/rewards_screen.dart';
 import 'package:flutter/material.dart';
 
 class TitleAndDrawer extends StatelessWidget {
@@ -69,7 +72,10 @@ class TitleAndDrawer extends StatelessWidget {
                   child: ListTile(
                     leading: Icon(Icons.person),
                     title: Text('Meu Perfil'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilScreen()),
+                      );
+                    },
                   ),
                 ),
                 Padding(
@@ -85,7 +91,10 @@ class TitleAndDrawer extends StatelessWidget {
                   child: ListTile(
                     leading: Icon(Icons.track_changes),
                     title: Text('Missões'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => MissionScreen()),
+                      );
+                    },
                   ),
                 ),
                 Padding(
@@ -93,7 +102,10 @@ class TitleAndDrawer extends StatelessWidget {
                   child: ListTile(
                     leading: Icon(Icons.emoji_events),
                     title: Text('Minha pontuação'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => RewardsScreen()),
+                      );
+                    },
                   ),
                 ),
                 Padding(
