@@ -1,4 +1,5 @@
 import 'package:europro/data/repository/remote_colaborador_repository.dart';
+import 'package:europro/data/repository/remote_missao_repository.dart';
 import 'package:europro/domain/models/colaborador.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
@@ -20,6 +21,10 @@ class _RankingScreenState extends State<RankingScreen> {
     client: Supabase.instance.client,
   );
 
+  final missoesRepo = RemoteMissaoRepository(client: Supabase.instance.client);
+
+  int missoesConcluidas = 0;
+
   List<Colaborador> colaboradores = [];
   bool isLoading = true;
 
@@ -27,20 +32,33 @@ class _RankingScreenState extends State<RankingScreen> {
   void initState() {
     super.initState();
     _findColaboradores();
+    _carregarMissoesConcluidas();
+  }
+
+  void _carregarMissoesConcluidas() async {
+    final resultado = await missoesRepo.countMissaoColaborador();
+    if (mounted) {
+      setState(() {
+        missoesConcluidas = resultado;
+      });
+    }
   }
 
   Future<void> _findColaboradores() async {
     try {
       final resultado = await colaboradorRepo.listRankingColaborador();
-      setState(() {
-        colaboradores = resultado;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          colaboradores = resultado;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      //print("Erro ao buscar colaboradores: $e");
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -59,7 +77,6 @@ class _RankingScreenState extends State<RankingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    int missoesConcluidas = 3;
     int totalMissoes = 5;
     double progresso = missoesConcluidas / totalMissoes;
 

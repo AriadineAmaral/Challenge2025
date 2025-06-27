@@ -1,6 +1,5 @@
-import 'package:europro/data/repository/controller/signup_controllers.dart';
+import 'package:europro/data/repository/controller/sign_up_controllers.dart';
 import 'package:europro/data/repository/remote_usuario_repository.dart';
-import 'package:europro/domain/models/usuario.dart';
 import 'package:europro/login_screens/complete_sign_up_screen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
@@ -248,13 +247,16 @@ class _AccessScreenState extends State<SignUpScreen> {
                       client: Supabase.instance.client,
                     );
 
-                    final novoUsuario = Usuario(
-                      idColaborador: null,
-                      email: email,
-                      senha: senha,
-                    );
+                    // final novoUsuario = Usuario(
+                    //   idColaborador: null,
+                    //   email: email,
+                    //   senha: senha,
+                    // );
 
-                    await usuarioRepo.addUsuario(novoUsuario, cpf);
+                    //await usuarioRepo.addUsuario(novoUsuario, cpf);
+
+                    await usuarioRepo.addUsuario(email, senha, cpf);
+
 
                     Navigator.push(
                       context,

@@ -1,10 +1,13 @@
+import 'package:europro/data/repository/controller/project_kaizen_clic_controllers.dart';
+import 'package:europro/data/repository/remote_projeto_repository.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:open_filex/open_filex.dart'; 
+import 'package:open_filex/open_filex.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProjectKaizen extends StatefulWidget {
   const ProjectKaizen({super.key});
@@ -14,9 +17,11 @@ class ProjectKaizen extends StatefulWidget {
 }
 
 class _ProjectKaizenState extends State<ProjectKaizen> {
+  final ProjectKaizenClicControllers _controllers = ProjectKaizenClicControllers();
+
   final List<PlatformFile> _selectedFiles = [];
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  // final TextEditingController _titleController = TextEditingController();
+  // final TextEditingController _descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +84,7 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: _titleController,
+              controller: _controllers.tituloController,
               maxLength: 100,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -97,14 +102,14 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
             ),
             const SizedBox(height: 8),
             Text(
-              '${_descriptionController.text.length}/6000 caracteres',
+              '${_controllers.descricaoController.text.length}/6000 caracteres',
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Stack(
               children: [
                 TextField(
-                  controller: _descriptionController,
+                  controller: _controllers.descricaoController,
                   maxLength: 6000,
                   maxLines: 8,
                   onChanged: (_) => setState(() {}),
@@ -168,22 +173,49 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                   backgroundColor: Colors.yellow,
                   foregroundColor: Colors.black,
                 ),
-                onPressed: () {
-                  // Implementar lógica de envio
-                  if (_titleController.text.isEmpty) {
+                onPressed: () async {
+                  final titulo = _controllers.tituloController.text;
+                  final descricao = _controllers.descricaoController.text;
+
+                  try {
+
+                    final projetoRepo = RemoteProjetoRepository(
+                      client: Supabase.instance.client,
+                    );
+                    
+                   if (titulo.isEmpty || descricao.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Por favor, insira um título'),
+                        content: Text('⚠️ Por favor, preencha todos os campos',
+                         style: TextStyle(color: Colors.black),
+                        ),
+                        backgroundColor: Color(0xFFFFF200),
                       ),
                     );
-                    return;
-                  }
+                  } else{
+                       await projetoRepo.addProjeto(titulo, descricao, '1');
 
-                  // Aqui você pode enviar os dados para o servidor
-                  print('Enviando proposta...');
-                  print('Título: ${_titleController.text}');
-                  print('Descrição: ${_descriptionController.text}');
-                  print('Arquivos anexados: ${_selectedFiles.length}');
+                     ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Inscrição realizada com sucesso!',
+                      style: TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                  } catch (e) {
+                    String mensagemErro = e.toString().replaceAll(
+                      'Exception: ',
+                      '',
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(mensagemErro,
+                      style: TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
                 child: const Text(
                   'ENVIAR',
@@ -365,12 +397,5 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
     setState(() {
       _selectedFiles.removeAt(index);
     });
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
   }
 }

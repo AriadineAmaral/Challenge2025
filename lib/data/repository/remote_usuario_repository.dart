@@ -1,7 +1,5 @@
-import 'package:bcrypt/bcrypt.dart';
 import 'package:europro/data/repository/usuario_repository.dart';
 import 'package:europro/domain/models/colaborador.dart';
-import 'package:europro/domain/models/usuario.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RemoteUsuarioRepository implements UsuarioRepository {
@@ -10,7 +8,7 @@ class RemoteUsuarioRepository implements UsuarioRepository {
   RemoteUsuarioRepository({required this.client});
 
   @override
-  Future<void> addUsuario(Usuario usuario, String cpf) async {
+  Future<void> addUsuario(String email, String senha, String cpf) async {
     try {
       final consultaCPF =
           await client
@@ -42,20 +40,25 @@ class RemoteUsuarioRepository implements UsuarioRepository {
           await client
               .from('usuarios')
               .select()
-              .eq('email', usuario.email)
+              .eq('email', email)
               .maybeSingle();
 
       if (emailRegistrado != null) {
         throw Exception('Email vinculado a outro usuário');
       }
 
-      final hashSenha = BCrypt.hashpw(usuario.senha, BCrypt.gensalt());
+      final response = await client.auth.signUp(email: email, password: senha);
 
-      await client.from('usuarios').insert({
-        'id_colaborador': colaborador.idColaborador,
-        'email': usuario.email,
-        'senha': hashSenha,
-      });
+      if (response.user != null) {
+        await client.from('usuarios').insert({
+          'id_colaborador': colaborador.idColaborador,
+          'email': email,
+          'user_id': response.user!.id,
+        });
+      } else {
+        throw Exception('Erro ao criar usuário.');
+      }
+
     } catch (e) {
       rethrow;
     }
@@ -64,26 +67,24 @@ class RemoteUsuarioRepository implements UsuarioRepository {
   @override
   Future<bool> findLoginUsuario(String email, String senha) async {
     try {
-      final result = await client
-          .from('usuarios')
-          .select('senha')
-          .eq('email', email);
+     
+      final response = await client.auth.signInWithPassword(
+        email: email,
+        password: senha,
+      );
 
-      if (result.isEmpty) {
-        throw Exception('Email ou senha inválidos');
-      }
-
-      if (result.isNotEmpty) {
-        String senhaHash = result[0]['senha'];
-        bool senhaCorreta = BCrypt.checkpw(senha, senhaHash);
-
-        if (!senhaCorreta) {
-          throw Exception('Email ou senha inválidos');
-        }
-      }
+      if (response.user == null) {
+        throw Exception('Email ou senha inválidos.');
+      } 
+      
       return true;
     } catch (e) {
-      rethrow;
+      if (e.toString().contains('Email not confirmed')) {
+      throw Exception('Você precisa confirmar seu e-mail antes de entrar.');
+    } else {
+     rethrow;
+    }
+      
     }
   }
 }

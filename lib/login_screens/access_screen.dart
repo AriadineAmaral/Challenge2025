@@ -1,7 +1,9 @@
 import 'package:europro/data/repository/controller/access_controllers.dart';
+import 'package:europro/data/repository/remote_usuario_repository.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class AccessScreen extends StatefulWidget {
@@ -138,53 +140,53 @@ class _AccessScreenState extends State<AccessScreen> {
                 textColor: Colors.black,
                 isBold: true,
                 onPressed: () async {
-                  // final email = _controllers.emailController.text.trim();
-                  // final senha = _controllers.senhaController.text.trim();
+                  final email = _controllers.emailController.text.trim();
+                  final senha = _controllers.senhaController.text.trim();
 
-                  // if (email.isEmpty || senha.isEmpty) {
-                  //   ScaffoldMessenger.of(context).showSnackBar(
-                  //     const SnackBar(
-                  //       content: Text('⚠️ Por favor, preencha todos os campos',
-                  //        style: TextStyle(color: Colors.black),
-                  //       ),
-                  //       backgroundColor: Color(0xFFFFF200),
-                  //     ),
-                  //   );
-                  //   return;
-                  // }
+                  if (email.isEmpty || senha.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('⚠️ Por favor, preencha todos os campos',
+                         style: TextStyle(color: Colors.black),
+                        ),
+                        backgroundColor: Color(0xFFFFF200),
+                      ),
+                    );
+                    return;
+                  }
 
-                  // try {
-                  //   final usuarioRepo = RemoteUsuarioRepository(
-                  //     client: Supabase.instance.client,
-                  //   );
+                  try {
+                    final usuarioRepo = RemoteUsuarioRepository(
+                      client: Supabase.instance.client,
+                    );
 
-                  //   bool result = await usuarioRepo.findLoginUsuario(
-                  //     email,
-                  //     senha,
-                  //   );
+                    bool result = await usuarioRepo.findLoginUsuario(
+                      email,
+                      senha,
+                    );
 
-                  //   if (result) {
+                    if (result) {
                        Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const RankingScreen(),
                       ),
                     );
-                  //   }
+                    }
                    
-                  // } catch (e) {
-                  //   String mensagemErro = e.toString().replaceAll(
-                  //     'Exception: ',
-                  //     '',
-                  //   );
-                  //   ScaffoldMessenger.of(context).showSnackBar(
-                  //     SnackBar(content: Text(mensagemErro,
-                  //     style: TextStyle(color: Colors.white),
-                  //       ),
-                  //       backgroundColor: Colors.red,
-                  //     ),
-                  //   );
-                  // }
+                  } catch (e) {
+                    String mensagemErro = e.toString().replaceAll(
+                      'Exception: ',
+                      '',
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(mensagemErro,
+                      style: TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
               ),
             ],

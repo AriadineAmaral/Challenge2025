@@ -14,5 +14,4 @@ class RemoteColaboradorRepository implements ColaboradorRepository {
     return colaboradores;
   }
 
-
 }

@@ -1,51 +1,43 @@
+import 'package:europro/data/repository/remote_projeto_repository.dart';
+import 'package:europro/domain/models/projeto.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class DetailProjects extends StatelessWidget {
-  const DetailProjects({super.key});
+class DetailProjects extends StatefulWidget {
+  final Projeto projeto;
 
-  // Dados mockados com tipos explícitos
-  final Map<String, dynamic> projeto = const {
-    'nome': 'Projeto Kaizen',
-    'titulo': 'Implementação de um Sistema de Reserva de Salas de Reunião',
-    'descricao': 'Implementar um sistema online para agendamento e reserva de salas de reunião, facilitando a organização e evitando conflitos de horário.',
-    'detalhes': [
-      {
-        'label': 'Plataforma:',
-        'value': 'Utilizar uma plataforma online de agendamento (Ex: Google Calendar, Microsoft Outlook Calendar, ou software específico para reserva de recursos).'
-      },
-      {
-        'label': 'Disponibilidade:',
-        'value': 'Disponibilizar painéis digitais próximos às salas de reunião exibindo a programação do dia.'
-      },
-      {
-        'label': 'Responsável:',
-        'value': 'TI ou Administrativo.'
-      }
-    ],
-    'anexos': [
-      'Diagrama_fluxo.pdf',
-      'Cronograma.xlsx',
-      'Orçamento.docx'
-    ],
-    'status': 'Em análise',
-    'dataEnvio': '15/05/2023'
-  };
+  const DetailProjects({Key? key, required this.projeto}) : super(key: key);
+
+  @override
+  State<DetailProjects> createState() => _MyProjectsState();
+}
+
+
+class _MyProjectsState extends State<DetailProjects> {
+  
+  final projetoRepo = RemoteProjetoRepository(client: Supabase.instance.client);
+
+  String _formataData(DateTime data) {
+    return DateFormat('dd/MM/yyyy').format(data);
+  }
+
+  List<Projeto> projetos = [];
+  bool isLoading = true;
 
   @override
   Widget build(BuildContext context) {
+   final projeto = widget.projeto;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
-        title: Image.asset(
-          'images/logoEuroPro.png',
-          height: 40,
-        ),
+        title: Image.asset('images/logoEuroPro.png', height: 40),
         centerTitle: true,
       ),
       drawer: TitleAndDrawer(),
@@ -62,7 +54,10 @@ class DetailProjects extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.black,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 16),
@@ -76,10 +71,18 @@ class DetailProjects extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 32),
-
+                  Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
                 // Nome do projeto centralizado
                 Text(
-                  projeto['nome'],
+                  projeto.tipoProjeto == 1
+                      ? 'Projeto Kaizen'
+                      : projeto.tipoProjeto == 2
+                      ? 'Projeto Clic'
+                      : 'Projeto desconhecido',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -90,11 +93,7 @@ class DetailProjects extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // Conteúdo em cards centralizados
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
+              
                         // Título
                         const Text(
                           'Título:',
@@ -106,7 +105,7 @@ class DetailProjects extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          projeto['titulo'],
+                          projeto.titulo,
                           style: const TextStyle(fontSize: 16),
                           textAlign: TextAlign.center,
                         ),
@@ -123,77 +122,77 @@ class DetailProjects extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          projeto['descricao'],
+                          projeto.descricao,
                           style: const TextStyle(fontSize: 16),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
 
                         // Detalhes
-                        ...projeto['detalhes'].map<Widget>((detalhe) => Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Column(
-                            children: [
-                              Text(
-                                detalhe['label'],
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                detalhe['value'],
-                                style: const TextStyle(fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        )).toList(),
+                        // ...projeto['detalhes'].map<Widget>((detalhe) => Padding(
+                        //   padding: const EdgeInsets.only(bottom: 16),
+                        //   child: Column(
+                        //     children: [
+                        //       Text(
+                        //         detalhe['label'],
+                        //         style: const TextStyle(
+                        //           fontSize: 16,
+                        //           fontWeight: FontWeight.bold,
+                        //         ),
+                        //         textAlign: TextAlign.center,
+                        //       ),
+                        //       const SizedBox(height: 4),
+                        //       Text(
+                        //         detalhe['value'],
+                        //         style: const TextStyle(fontSize: 16),
+                        //         textAlign: TextAlign.center,
+                        //       ),
+                        //     ],
+                        //   ),
+                        // )).toList(),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                //const SizedBox(height: 24),
 
                 // Anexos
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Anexos:',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        Column(
-                          children: projeto['anexos'].map<Widget>((arquivo) => ListTile(
-                            leading: const Icon(Icons.attach_file, color: Colors.grey),
-                            title: Text(arquivo, textAlign: TextAlign.center),
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Visualizar $arquivo')),
-                              );
-                            },
-                          )).toList(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                // Card(
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(16.0),
+                //     child: Column(
+                //       children: [
+                //         const Text(
+                //           'Anexos:',
+                //           style: TextStyle(
+                //             fontSize: 16,
+                //             fontWeight: FontWeight.bold,
+                //           ),
+                //           textAlign: TextAlign.center,
+                //         ),
+                //         const SizedBox(height: 16),
+                //         Column(
+                //           children: projeto['anexos'].map<Widget>((arquivo) => ListTile(
+                //             leading: const Icon(Icons.attach_file, color: Colors.grey),
+                //             title: Text(arquivo, textAlign: TextAlign.center),
+                //             onTap: () {
+                //               ScaffoldMessenger.of(context).showSnackBar(
+                //                 SnackBar(content: Text('Visualizar $arquivo')),
+                //               );
+                //             },
+                //           )).toList(),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                //const SizedBox(height: 24),
 
                 // Data de envio
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
-                    'Enviado em: ${projeto['dataEnvio']}',
+                    'Enviado em: ${DateFormat('dd/MM/yyyy').format(projeto.dataInicio)}',
                     style: const TextStyle(color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
@@ -245,8 +244,9 @@ class DetailProjects extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildSimpleNavIcon({
+Widget _buildSimpleNavIcon({
   required IconData icon,
   required VoidCallback onPressed,
 }) {
@@ -260,5 +260,4 @@ class DetailProjects extends StatelessWidget {
     constraints: BoxConstraints(), // Remove restrições de tamanho padrão
     onPressed: onPressed,
   );
-}
 }

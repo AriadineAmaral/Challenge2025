@@ -1,11 +1,87 @@
+import 'package:europro/data/repository/remote_missao_repository.dart';
+import 'package:europro/domain/models/missao.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class MissionScreen extends StatelessWidget {
+class MissionScreen extends StatefulWidget {
   const MissionScreen({super.key});
+
+  @override
+  State<MissionScreen> createState() => _MissionScreenState();
+}
+
+class _MissionScreenState extends State<MissionScreen> {
+  final missaoRepo = RemoteMissaoRepository(client: Supabase.instance.client);
+
+  List<Missao> missoes = [];
+  // List<ColaboradorMissao> colaboradorMissoes = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _findMissoes();
+    // _findColaboradorMissoes();
+  }
+
+  Future<void> _findMissoes() async {
+    try {
+      final resultado = await missaoRepo.listMissoes();
+      if (mounted) {
+        setState(() {
+          missoes = resultado;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Future<void> _findColaboradorMissoes() async {
+  //   try {
+  //     final resultado = await missaoRepo.listColaboradorMissoes();
+  //     if (mounted) {
+  //       setState(() {
+  //         colaboradorMissoes = resultado;
+  //         isLoading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
+
+  // Future<bool> _isMissaoConcluida(int idMissao) async {
+  //   try {
+  //     final resultado = await missaoRepo.isMissaoConcluida(idMissao);
+  //     if (mounted) {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //     }
+  //     return resultado;
+  //   } catch (e) {
+  //     if (mounted) {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //     }
+  //     return false;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

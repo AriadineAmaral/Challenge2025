@@ -1,8 +1,11 @@
+import 'package:europro/data/repository/remote_projeto_repository.dart';
+import 'package:europro/domain/models/projeto.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/projects_screens/detail_projects_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyProjects extends StatefulWidget {
   const MyProjects({Key? key}) : super(key: key);
@@ -12,13 +15,37 @@ class MyProjects extends StatefulWidget {
 }
 
 class _MeusProjetosScreenState extends State<MyProjects> {
-  // Lista de projetos (será populada quando enviar da outra tela)
-  final List<Projeto> _projetos = [
-    Projeto(nome: 'Projeto Kaizen', status: 'análise e seleção'),
-    Projeto(nome: 'Projeto Clic', status: 'desenvolvimento'),
-    Projeto(nome: 'Projeto Kaizen', status: 'finalizado'),
-    Projeto(nome: 'Projeto Kaizen', status: 'finalizado'),
-  ];
+
+
+  final projetoRepo = RemoteProjetoRepository(
+   client: Supabase.instance.client,
+  );
+
+  List<Projeto> projetos = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _findProjetos();
+  }
+
+  Future<void> _findProjetos() async {
+    print('userID: ${Supabase.instance.client.auth.currentUser?.id}');
+
+    try {
+      final resultado = await projetoRepo.listProjetosColaborador();
+      setState(() {
+        projetos = resultado;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,20 +90,21 @@ class _MeusProjetosScreenState extends State<MyProjects> {
             ListView.separated(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: _projetos.length,
+              itemCount: projetos.length,
               separatorBuilder: (context, index) => const Divider(height: 24),
               itemBuilder: (context, index) {
-                final projeto = _projetos[index];
+                final projeto = projetos[index];
                 return _ProjetoCard(
                   projeto: projeto,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DetailProjects(),
-                      ),
-                    );
-                  },
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailProjects(projeto: projeto),
+                    ),
+                  );
+                }
+
                 );
               },
             ),
@@ -178,7 +206,11 @@ class _ProjetoCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  projeto.nome,
+                   projeto.tipoProjeto == 1
+                  ? 'Projeto Kaizen'
+                  : projeto.tipoProjeto == 2
+                      ? 'Projeto Clic'
+                      : 'Projeto desconhecido',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -191,7 +223,7 @@ class _ProjetoCard extends StatelessWidget {
             const SizedBox(height: 8),
             // Status
             Text(
-              'Status: ${_capitalize(projeto.status)}',
+              'Status: ${_capitalize(projeto.idStatus == 1 ? 'análise e seleção' : projeto.idStatus == 2 ? 'em desenvolvimento' : 'finalizado')}',
               style: const TextStyle(fontSize: 14),
             ),
           ],
@@ -205,9 +237,9 @@ class _ProjetoCard extends StatelessWidget {
   }
 }
 
-class Projeto {
-  final String nome;
-  final String status;
+// class Projeto {
+//   final String nome;
+//   final String status;
 
-  Projeto({required this.nome, required this.status});
-}
+//   Projeto({required this.nome, required this.status});
+// }
