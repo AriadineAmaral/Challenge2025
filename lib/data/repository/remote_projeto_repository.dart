@@ -8,48 +8,51 @@ class RemoteProjetoRepository implements ProjetoRepository {
   RemoteProjetoRepository({required this.client});
 
   @override
-  Future<void> addProjeto(
-    String titulo,
-    String descricao,
-    String tipoProjeto,
-  ) async {
-    try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
+Future<int> addProjeto(
+  String titulo,
+  String descricao,
+  String tipoProjeto,
+) async {
+  try {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
 
-      final usuario =
-          await Supabase.instance.client
-              .from('usuarios')
-              .select('id_colaborador')
-              .eq('user_id', userId.toString())
-              .maybeSingle();
+    final usuario = await Supabase.instance.client
+        .from('usuarios')
+        .select('id_colaborador')
+        .eq('user_id', userId.toString())
+        .maybeSingle();
 
-      if (usuario != null) {
-        final colaboradorId = usuario['id_colaborador'];
+    if (usuario != null) {
+      final colaboradorId = usuario['id_colaborador'];
 
-        final projetoInserido =
-            await client
-                .from('projetos')
-                .insert({
-                  'titulo': titulo,
-                  'descricao': descricao,
-                  'data_inicio': DateTime.now().toIso8601String(),
-                  'tipo_projeto': tipoProjeto,
-                  'id_status_projetos': 1,
-                })
-                .select('id_projeto')
-                .single();
+      final projetoInserido = await client
+          .from('projetos')
+          .insert({
+            'titulo': titulo,
+            'descricao': descricao,
+            'data_inicio': DateTime.now().toIso8601String(),
+            'tipo_projeto': tipoProjeto,
+            'id_status_projetos': 1,
+          })
+          .select('id_projeto')
+          .single();
 
-        final idProjeto = projetoInserido['id_projeto'];
+      final idProjeto = projetoInserido['id_projeto'];
 
-        await client.from('inscricoes_projetos').insert({
-          'id_colaborador': colaboradorId,
-          'id_projeto': idProjeto,
-        });
-      }
-    } catch (e) {
-      throw ('Erro ao enviar inscrição: $e');
+      await client.from('inscricoes_projetos').insert({
+        'id_colaborador': colaboradorId,
+        'id_projeto': idProjeto,
+      });
+
+      return idProjeto;
+    } else {
+      throw Exception('Usuário não encontrado');
     }
+  } catch (e) {
+    throw Exception('Erro ao enviar inscrição: $e');
   }
+}
+
 
   @override
   Future<List<Projeto>> listProjetosColaborador() async {
