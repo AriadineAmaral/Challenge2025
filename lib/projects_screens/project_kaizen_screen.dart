@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:io';
 
 class ProjectKaizen extends StatefulWidget {
   const ProjectKaizen({super.key});
@@ -17,7 +18,8 @@ class ProjectKaizen extends StatefulWidget {
 }
 
 class _ProjectKaizenState extends State<ProjectKaizen> {
-  final ProjectKaizenClicControllers _controllers = ProjectKaizenClicControllers();
+  final ProjectKaizenClicControllers _controllers =
+      ProjectKaizenClicControllers();
 
   final List<PlatformFile> _selectedFiles = [];
   // final TextEditingController _titleController = TextEditingController();
@@ -174,16 +176,13 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                   foregroundColor: Colors.black,
                 ),
                 onPressed: () async {
+                  final supabase = Supabase.instance.client;
+                  final projetoRepo = RemoteProjetoRepository(client: supabase);
+
                   final titulo = _controllers.tituloController.text;
                   final descricao = _controllers.descricaoController.text;
 
-                  try {
-
-                    final projetoRepo = RemoteProjetoRepository(
-                      client: Supabase.instance.client,
-                    );
-                    
-                   if (titulo.isEmpty || descricao.isEmpty) {
+                  if (titulo.isEmpty || descricao.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('⚠️ Por favor, preencha todos os campos',
@@ -192,31 +191,74 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                         backgroundColor: Color(0xFFFFF200),
                       ),
                     );
-                  } else{
-                       await projetoRepo.addProjeto(titulo, descricao, '1');
+                    return;
+                  }
 
-                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Inscrição realizada com sucesso!',
-                      style: TextStyle(color: Colors.white),
-                        ),
+                  try {
+                    final idProjeto = await projetoRepo.addProjeto(
+                      titulo,
+                      descricao,
+                      '1',
+                    );
+
+                    for (final file in _selectedFiles) {
+                      final fileBytes = file.bytes;
+                      final fileName = file.name;
+
+                      if (fileBytes == null) {
+                        print('Arquivo ${file.name} sem bytes, ignorando...');
+                        continue;
+                      }
+
+                      final storagePath = 'projetos/$idProjeto/$fileName';
+
+                      print('Fazendo upload do arquivo: $fileName');
+
+                      final response = await supabase.storage
+                          .from('arquivos')
+                          .uploadBinary(
+                            storagePath,
+                            fileBytes,
+                            fileOptions: const FileOptions(upsert: true),
+                          );
+
+                      print('Resposta do upload: $response');
+
+                      if (response.isEmpty) {
+                        print('Erro: resposta do upload está vazia');
+                        continue;
+                      }
+
+                      final publicUrl = supabase.storage
+                          .from('arquivos')
+                          .getPublicUrl(storagePath);
+
+                      print('URL pública do arquivo: $publicUrl');
+
+                      await supabase.from('arquivos').insert({
+                        'id_projeto': idProjeto,
+                        'nome_arquivo': fileName,
+                        'caminho': publicUrl,
+                      });
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Inscrição finalizada com sucesso!'),
                         backgroundColor: Colors.green,
                       ),
                     );
-                  }
                   } catch (e) {
-                    String mensagemErro = e.toString().replaceAll(
-                      'Exception: ',
-                      '',
-                    );
+                    print('Erro no upload: $e');
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(mensagemErro,
-                      style: TextStyle(color: Colors.white),
-                        ),
+                      SnackBar(
+                        content: Text('Erro: $e'),
                         backgroundColor: Colors.red,
                       ),
                     );
                   }
                 },
+
                 child: const Text(
                   'ENVIAR',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

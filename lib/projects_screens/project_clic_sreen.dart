@@ -7,7 +7,7 @@ import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; 
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProjectClic extends StatefulWidget {
   const ProjectClic({super.key});
@@ -16,11 +16,11 @@ class ProjectClic extends StatefulWidget {
   State<ProjectClic> createState() => _ProjectClicState();
 }
 
-
 class _ProjectClicState extends State<ProjectClic> {
   final List<PlatformFile> _selectedFiles = [];
-  final ProjectKaizenClicControllers _controllers = ProjectKaizenClicControllers();
- 
+  final ProjectKaizenClicControllers _controllers =
+      ProjectKaizenClicControllers();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,9 +62,7 @@ class _ProjectClicState extends State<ProjectClic> {
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
-                            color: Color(
-                              0xFF00358E,
-                            ), 
+                            color: Color(0xFF00358E),
                           ),
                         ),
                       ],
@@ -171,46 +169,86 @@ class _ProjectClicState extends State<ProjectClic> {
                   backgroundColor: Colors.yellow,
                   foregroundColor: Colors.black,
                 ),
-                onPressed: () async{
-                  // Implementar lógica de envio
+                onPressed: () async {
+                  final supabase = Supabase.instance.client;
+                  final projetoRepo = RemoteProjetoRepository(client: supabase);
+
                   final titulo = _controllers.tituloController.text;
                   final descricao = _controllers.descricaoController.text;
 
-                  try {
-
-                    final projetoRepo = RemoteProjetoRepository(
-                      client: Supabase.instance.client,
-                    );
-                    
-                   if (titulo.isEmpty || descricao.isEmpty) {
+                  if (titulo.isEmpty || descricao.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('⚠️ Por favor, preencha todos os campos',
-                         style: TextStyle(color: Colors.black),
+                        style: TextStyle(color: Colors.black),
                         ),
                         backgroundColor: Color(0xFFFFF200),
                       ),
                     );
-                  } else{
-                       await projetoRepo.addProjeto(titulo, descricao, '2');
+                    return;
+                  }
 
-                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Inscrição realizada com sucesso!',
-                      style: TextStyle(color: Colors.white),
+                  try {
+                    final idProjeto = await projetoRepo.addProjeto(
+                      titulo,
+                      descricao,
+                      '1',
+                    );
+
+                    for (final file in _selectedFiles) {
+                      final fileBytes = file.bytes;
+                      final fileName = file.name;
+
+                      if (fileBytes == null) {
+                        print('Arquivo ${file.name} sem bytes, ignorando...');
+                        continue;
+                      }
+
+                      final storagePath = 'projetos/$idProjeto/$fileName';
+
+                      print('Fazendo upload do arquivo: $fileName');
+
+                      final response = await supabase.storage
+                          .from('arquivos')
+                          .uploadBinary(
+                            storagePath,
+                            fileBytes,
+                            fileOptions: const FileOptions(upsert: true),
+                          );
+
+                      print('Resposta do upload: $response');
+
+                      if (response.isEmpty) {
+                        print('Erro: resposta do upload está vazia');
+                        continue;
+                      }
+
+                      final publicUrl = supabase.storage
+                          .from('arquivos')
+                          .getPublicUrl(storagePath);
+
+                      print('URL pública do arquivo: $publicUrl');
+
+                      await supabase.from('arquivos').insert({
+                        'id_projeto': idProjeto,
+                        'nome_arquivo': fileName,
+                        'caminho': publicUrl,
+                      });
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Inscrição realizada com sucesso!',
                         ),
                         backgroundColor: Colors.green,
                       ),
                     );
-                  }
                   } catch (e) {
-                    String mensagemErro = e.toString().replaceAll(
-                      'Exception: ',
-                      '',
-                    );
+                    print('Erro no upload: $e');
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(mensagemErro,
-                      style: TextStyle(color: Colors.white),
-                        ),
+                      SnackBar(
+                        content: Text('Erro: $e'),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -283,7 +321,7 @@ class _ProjectClicState extends State<ProjectClic> {
       onPressed: onPressed,
     );
   }
-  
+
   //Logica para escolher e enviar arquivos
   Future<void> _pickFiles() async {
     try {
@@ -398,5 +436,4 @@ class _ProjectClicState extends State<ProjectClic> {
       _selectedFiles.removeAt(index);
     });
   }
-
-}
+  }
