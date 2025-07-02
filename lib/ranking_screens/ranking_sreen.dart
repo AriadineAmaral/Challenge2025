@@ -37,9 +37,11 @@ class _RankingScreenState extends State<RankingScreen> {
 
   void _carregarMissoesConcluidas() async {
     final resultado = await missoesRepo.countMissaoColaborador();
+    print('🔎 Resultado da contagem de missões concluídas: $resultado');
     if (mounted) {
       setState(() {
         missoesConcluidas = resultado;
+          isLoading = false;
       });
     }
   }
@@ -79,7 +81,7 @@ class _RankingScreenState extends State<RankingScreen> {
   Widget build(BuildContext context) {
     int totalMissoes = 5;
     double progresso = missoesConcluidas / totalMissoes;
-
+    print(missoesConcluidas);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

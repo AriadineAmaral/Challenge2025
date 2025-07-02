@@ -1,4 +1,5 @@
 import 'package:europro/data/repository/remote_missao_repository.dart';
+import 'package:europro/domain/models/colaborador_missao.dart';
 import 'package:europro/domain/models/missao.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
@@ -18,14 +19,14 @@ class _MissionScreenState extends State<MissionScreen> {
   final missaoRepo = RemoteMissaoRepository(client: Supabase.instance.client);
 
   List<Missao> missoes = [];
-  // List<ColaboradorMissao> colaboradorMissoes = [];
+  List<ColaboradorMissao> colaboradorMissoes = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _findMissoes();
-    // _findColaboradorMissoes();
+    _findColaboradorMissoes();
   }
 
   Future<void> _findMissoes() async {
@@ -46,42 +47,31 @@ class _MissionScreenState extends State<MissionScreen> {
     }
   }
 
-  // Future<void> _findColaboradorMissoes() async {
-  //   try {
-  //     final resultado = await missaoRepo.listColaboradorMissoes();
-  //     if (mounted) {
-  //       setState(() {
-  //         colaboradorMissoes = resultado;
-  //         isLoading = false;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     if (mounted) {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //     }
-  //   }
-  // }
+  Future<void> _findColaboradorMissoes() async {
+    try {
+      final resultado = await missaoRepo.listColaboradorMissoes();
+      if (mounted) {
+        setState(() {
+          colaboradorMissoes = resultado;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
-  // Future<bool> _isMissaoConcluida(int idMissao) async {
-  //   try {
-  //     final resultado = await missaoRepo.isMissaoConcluida(idMissao);
-  //     if (mounted) {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //     }
-  //     return resultado;
-  //   } catch (e) {
-  //     if (mounted) {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //     }
-  //     return false;
-  //   }
-  // }
+  bool isMissaoConcluida(
+    List<ColaboradorMissao> colaboradorMissoes,
+    int idMissao,
+  ) {
+    return colaboradorMissoes.any((c) => c.idMissao == idMissao);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -134,45 +124,27 @@ class _MissionScreenState extends State<MissionScreen> {
             ),
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(12),
-              children: [
-                _MissaoItem(
-                  title: 'Complete o quiz sobre a nossa cultura',
-                  points: 'Ganhe 15 pontos',
-                  buttonLabel: 'começar',
-                  buttonColor: const Color(0xFF00358E),
-                  onButtonPressed: () {},
-                ),
-                _MissaoItem(
-                  title: 'Veja as novidades da semana',
-                  points: 'Ganhe 8 pontos',
-                  buttonLabel: 'concluída',
-                  buttonColor: Colors.grey.shade300,
-                  onButtonPressed: null,
-                ),
-                _MissaoItem(
-                  title: 'Responda a nossa pesquisa de satisfação',
-                  points: 'Ganhe 20 pontos',
-                  buttonLabel: 'concluída',
-                  buttonColor: Colors.grey.shade300,
-                  onButtonPressed: null,
-                ),
-                _MissaoItem(
-                  title: 'Complete o quiz sobre os nossos projetos',
-                  points: 'Ganhe 12 pontos',
-                  buttonLabel: 'começar',
-                  buttonColor: const Color(0xFF00358E),
-                  onButtonPressed: () {},
-                ),
-                _MissaoItem(
-                  title: 'Responda a nossa pesquisa de ESG',
-                  points: 'Ganhe 15 pontos',
-                  buttonLabel: 'concluída',
-                  buttonColor: Colors.grey.shade300,
-                  onButtonPressed: null,
-                ),
-              ],
+            child: ListView.builder(
+              itemCount: missoes.length,
+              itemBuilder: (context, index) {
+                final isConcluida = isMissaoConcluida(colaboradorMissoes, missoes[index].idMissao);
+                return Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: _MissaoItem(
+  title: missoes[index].titulo,
+  points: 'Ganhe ${missoes[index].pontos} pontos',
+  buttonLabel: isConcluida ? 'concluída' : 'começar',
+  buttonColor: isConcluida ? const Color(0xFF979797) : const Color(0xFF00358E),
+  onButtonPressed: isConcluida
+      ? null 
+      : () async {
+          await missaoRepo.concluirMissao(missoes[index].idMissao, missoes[index].pontos);
+          await _findColaboradorMissoes(); 
+          if (mounted) setState(() {});
+        },
+            ),
+                );
+              },
             ),
           ),
           Container(

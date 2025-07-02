@@ -1,24 +1,139 @@
+import 'package:europro/data/repository/remote_pontuacao_repository.dart';
+import 'package:europro/domain/models/pontuacao.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class RewardsScreen extends StatelessWidget {
+class RewardsScreen extends StatefulWidget {
   const RewardsScreen({super.key});
+  @override
+  State<RewardsScreen> createState() => _RewardsScreenState();
+}
+
+class _RewardsScreenState extends State<RewardsScreen> {
+  final pontuacaoRepo = RemotePontuacaoRepository(
+    client: Supabase.instance.client,
+  );
+
+  int pontuacao = 0;
+  List<Pontuacao> historicoPontuacao = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarPontuacao();
+    _listPontuacao();
+  }
+
+  void _carregarPontuacao() async {
+    final resultado = await pontuacaoRepo.pontuacaoColaborador();
+    if (mounted) {
+      setState(() {
+        pontuacao = resultado;
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _listPontuacao() async {
+    try {
+      final resultado = await pontuacaoRepo.listPontuacao();
+      if (mounted) {
+        setState(() {
+          historicoPontuacao = resultado;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  List<Map<String, String>> historico(List<Pontuacao> historicoPontuacao) {
+    final hoje = DateTime.now();
+
+    historicoPontuacao.sort((a, b) => b.dataOrigem.compareTo(a.dataOrigem));
+
+    final List<Map<String, String>> pontos = [];
+
+    for (var pontuacao in historicoPontuacao) {
+      final expirou = pontuacao.dataVencimento.isBefore(hoje);
+
+      pontos.add({
+        "pontos": "${expirou ? '-' : '+'} ${pontuacao.pontos} pts",
+        "descricao":
+            pontuacao.origem == 'Criação de projeto'
+                ? 'Criação de projeto'
+                : 'Missão concluída',
+        "expira":
+            expirou
+                ? "Expirado em ${_formatarData(pontuacao.dataVencimento)}"
+                : "Expira em ${_formatarData(pontuacao.dataVencimento)}",
+      });
+    }
+
+    return pontos;
+  }
+
+  String _formatarData(DateTime data) {
+    return "${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}";
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> missoes = [
-      {"pontos": "+ 8 pts", "descricao": "Missão concluída", "expira": "Expira em 30/10/2025"},
-      {"pontos": "+ 15 pts", "descricao": "Missão concluída", "expira": "Expira em 17/10/2025"},
-      {"pontos": "- 18 pts", "descricao": "Missão concluída", "expira": "Expirado em 12/07/2025"},
-      {"pontos": "+ 20 pts", "descricao": "Missão concluída", "expira": "Expira em 5/10/2025"},
-      {"pontos": "+ 50 pts", "descricao": "Inscrição Kaizen", "expira": "Expira em 5/09/2025"},
-      {"pontos": "- 5 pts", "descricao": "Missão concluída", "expira": "Expira em 25/08/2025"},
-      {"pontos": "+ 100 pts", "descricao": "Inscrição Clic", "expira": "Expira em 15/07/2025"},
-      {"pontos": "- 12 pts", "descricao": "Missão concluída", "expira": "Expirado em 8/07/2025"},
-    ];
+    List<Map<String, String>> historicoFormatado = historico(
+      historicoPontuacao,
+    );
+    // final List<Map<String, String>> missoes = [
+    //   {
+    //     "pontos": "+ 8 pts",
+    //     "descricao": "Missão concluída",
+    //     "expira": "Expira em 30/10/2025",
+    //   },
+    //   {
+    //     "pontos": "+ 15 pts",
+    //     "descricao": "Missão concluída",
+    //     "expira": "Expira em 17/10/2025",
+    //   },
+    //   {
+    //     "pontos": "- 18 pts",
+    //     "descricao": "Missão concluída",
+    //     "expira": "Expirado em 12/07/2025",
+    //   },
+    //   {
+    //     "pontos": "+ 20 pts",
+    //     "descricao": "Missão concluída",
+    //     "expira": "Expira em 5/10/2025",
+    //   },
+    //   {
+    //     "pontos": "+ 50 pts",
+    //     "descricao": "Inscrição Kaizen",
+    //     "expira": "Expira em 5/09/2025",
+    //   },
+    //   {
+    //     "pontos": "- 5 pts",
+    //     "descricao": "Missão concluída",
+    //     "expira": "Expira em 25/08/2025",
+    //   },
+    //   {
+    //     "pontos": "+ 100 pts",
+    //     "descricao": "Inscrição Clic",
+    //     "expira": "Expira em 15/07/2025",
+    //   },
+    //   {
+    //     "pontos": "- 12 pts",
+    //     "descricao": "Missão concluída",
+    //     "expira": "Expirado em 8/07/2025",
+    //   },
+    // ];
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +168,9 @@ class RewardsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 48), // Para compensar o espaço do ícone de voltar
+                const SizedBox(
+                  width: 48,
+                ), // Para compensar o espaço do ícone de voltar
               ],
             ),
 
@@ -69,11 +186,11 @@ class RewardsScreen extends StatelessWidget {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(Icons.emoji_events, color: Colors.white, size: 28),
                   SizedBox(width: 12),
                   Text(
-                    '193',
+                    '$pontuacao',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
@@ -116,9 +233,9 @@ class RewardsScreen extends StatelessWidget {
                 child: Scrollbar(
                   thumbVisibility: true,
                   child: ListView.builder(
-                    itemCount: missoes.length,
+                    itemCount: historicoFormatado.length,
                     itemBuilder: (context, index) {
-                      final missao = missoes[index];
+                      final missao = historicoFormatado[index];
                       final isNegative = missao["pontos"]!.contains('-');
 
                       return Align(
@@ -131,7 +248,10 @@ class RewardsScreen extends StatelessWidget {
                               Text(
                                 '${missao["pontos"]} ${missao["descricao"]}',
                                 style: TextStyle(
-                                  color: isNegative ? Colors.red : const Color(0xFF00358E),
+                                  color:
+                                      isNegative
+                                          ? Colors.red
+                                          : const Color(0xFF00358E),
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,
@@ -199,7 +319,7 @@ class RewardsScreen extends StatelessWidget {
     );
   }
 
-   Widget _buildSimpleNavIcon({
+  Widget _buildSimpleNavIcon({
     required IconData icon,
     required VoidCallback onPressed,
   }) {

@@ -4,8 +4,6 @@ import 'package:europro/domain/models/missao.dart';
 abstract class MissaoRepository {
   Future<List<Missao>> listMissoes();
   Future<List<ColaboradorMissao>> listColaboradorMissoes();
-  Future <void> concluirMissao(int idMissao);
-  Future <int> countMissaoColaborador();
-  Future<String> isMissaoConcluida(int idMissao);
-
+  Future<void> concluirMissao(int idMissao, int pontos);
+  Future<int> countMissaoColaborador();
 }

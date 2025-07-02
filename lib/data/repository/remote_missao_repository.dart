@@ -53,18 +53,15 @@ class RemoteMissaoRepository implements MissaoRepository {
 
       final result = await client
           .from('colaboradores_missoes')
-          .select('*, missoes(*)')
-          .eq('disponivel', true)
+          .select('*, missoes!inner(*)')
+          .eq('missoes.disponivel', true)
           .eq('id_colaborador', colaboradorId);
 
-      if (result.isEmpty) {
-        return [];
-      }
+      if (result.isEmpty) return [];
 
-      final missoes =
-          result
-              .map((e) => ColaboradorMissao.fromMap(e['colaboradores_missoes']))
-              .toList();
+      final missoes = result.map((e) => ColaboradorMissao.fromMap(e)).toList();
+
+      print(missoes);
 
       return missoes;
     } catch (e) {
@@ -73,7 +70,7 @@ class RemoteMissaoRepository implements MissaoRepository {
   }
 
   @override
-  Future<void> concluirMissao(int idMissao) async {
+  Future<void> concluirMissao(int idMissao, int pontos) async {
     try {
       final userId = Supabase.instance.client.auth.currentUser?.id;
 
@@ -90,6 +87,7 @@ class RemoteMissaoRepository implements MissaoRepository {
 
       final colaboradorId = usuario['id_colaborador'];
 
+
       final resultado = await client
           .from('colaboradores_missoes')
           .select('*')
@@ -101,6 +99,25 @@ class RemoteMissaoRepository implements MissaoRepository {
           'id_colaborador': colaboradorId,
           'id_missao': idMissao,
         });
+
+           final colaborador = await client
+          .from('colaboradores')
+          .select('pontos')
+          .eq('id_colaborador', colaboradorId)
+          .maybeSingle();
+
+      if (colaborador == null) {
+        print('Colaborador não encontrado');
+        return;
+      }
+
+        final pontosAtuais = colaborador['pontos'] ?? 0;
+        final novoTotal = pontosAtuais + pontos;
+
+      await client
+          .from('colaboradores')
+          .update({'pontos': novoTotal})
+          .eq('id_colaborador', colaboradorId);
       }
     } catch (e) {
       rethrow;
@@ -144,37 +161,5 @@ class RemoteMissaoRepository implements MissaoRepository {
     } catch (e) {
       rethrow;
     }
-  }
-
-  @override
-  Future<String> isMissaoConcluida(int idMissao) async {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
-
-    final usuario =
-        await client
-            .from('usuarios')
-            .select('id_colaborador')
-            .eq('user_id', userId.toString())
-            .maybeSingle();
-
-    if (usuario == null) {
-      throw Exception('Usuario não localizado');
-    }
-
-    final colaboradorId = usuario['id_colaborador'];
-
-    final resultado =
-        await client
-            .from('colaboradores_missoes')
-            .select('id_missao')
-            .eq('id_colaborador', colaboradorId)
-            .eq('id_missao', idMissao)
-            .maybeSingle();
-
-    if (resultado == null) {
-      return 'começar';
-    }
-
-    return 'concluida';
   }
 }
