@@ -1,7 +1,7 @@
 import 'package:europro/login_screens/access_screen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CompleteSignUpScreen extends StatefulWidget {
   const CompleteSignUpScreen({super.key});
@@ -29,25 +29,26 @@ class _AccessScreenState extends State<CompleteSignUpScreen> {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: TextStyle(fontSize: 45, color: Colors.black),
+                  style: GoogleFonts.akatab(
+                    fontSize: 36,
+                    color: Colors.black,
+                  ),
                   children: <TextSpan>[
                     TextSpan(text: 'Bem-Vindo(a)\n ao '),
                     TextSpan(
                       text: 'EuroPro',
-                      style: TextStyle(color: Color(0xFF00358E)),
+                      style: GoogleFonts.akatab(
+                        color: Color(0xFF00358E),
+                        fontSize: 36, // Mantenha o tamanho consistente
+                        fontWeight:
+                            FontWeight.bold, // Opcional: se quiser negrito
+                      ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.check_rounded, size: 80, color: Colors.green,)
-                  .animate() 
-                  .rotate(
-                    // Animação de rotação
-                    duration: 2.seconds, 
-                    curve: Curves.elasticOut, 
-                    begin: 0, 
-                    end: 1, 
-                  ),
+              Icon(Icons.check_rounded, size: 80, color: Colors.green),
+                  
               const SizedBox(height: 10),
               // Botão Entrar
               Button(

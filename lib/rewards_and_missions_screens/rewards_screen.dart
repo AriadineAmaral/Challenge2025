@@ -5,6 +5,7 @@ import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RewardsScreen extends StatefulWidget {
@@ -140,8 +141,10 @@ class _RewardsScreenState extends State<RewardsScreen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
+        elevation: 2,
+        shadowColor: Colors.black,
         scrolledUnderElevation: 0,
-        title: Image.asset('images/logoEuroPro.png', height: 40),
+        title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       backgroundColor: Colors.white,
       drawer: TitleAndDrawer(),
@@ -155,13 +158,15 @@ class _RewardsScreenState extends State<RewardsScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()));
+                  },
                 ),
                 Expanded(
                   child: Text(
                     'Minha pontuação',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: GoogleFonts.akatab(
                       fontWeight: FontWeight.bold,
                       fontSize: 22,
                       color: Colors.black,
@@ -191,7 +196,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                   SizedBox(width: 12),
                   Text(
                     '$pontuacao',
-                    style: TextStyle(
+                    style: GoogleFonts.kufam(
                       color: Colors.white,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -204,9 +209,9 @@ class _RewardsScreenState extends State<RewardsScreen> {
             const SizedBox(height: 16),
 
             // Histórico de pontuação - Título
-            const Text(
+            Text(
               "Histórico de pontuação",
-              style: TextStyle(
+              style: GoogleFonts.akatab(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -247,7 +252,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                             children: [
                               Text(
                                 '${missao["pontos"]} ${missao["descricao"]}',
-                                style: TextStyle(
+                                style: GoogleFonts.kufam(
                                   color:
                                       isNegative
                                           ? Colors.red
@@ -258,7 +263,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                               ),
                               Text(
                                 missao["expira"]!,
-                                style: const TextStyle(
+                                style: GoogleFonts.kufam(
                                   color: Colors.grey,
                                   fontSize: 12,
                                 ),

@@ -1,12 +1,14 @@
 import 'package:europro/data/repository/remote_colaborador_repository.dart';
 import 'package:europro/data/repository/remote_missao_repository.dart';
 import 'package:europro/domain/models/colaborador.dart';
+import 'package:europro/mission_screens/missions_screen.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:europro/widgets/projects.dart';
 import 'package:flutter/material.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RankingScreen extends StatefulWidget {
@@ -41,7 +43,7 @@ class _RankingScreenState extends State<RankingScreen> {
     if (mounted) {
       setState(() {
         missoesConcluidas = resultado;
-          isLoading = false;
+        isLoading = false;
       });
     }
   }
@@ -87,8 +89,10 @@ class _RankingScreenState extends State<RankingScreen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
+        elevation: 2,
+        shadowColor: Colors.black,
         scrolledUnderElevation: 0,
-        title: Image.asset('images/logoEuroPro.png', height: 40),
+        title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
@@ -100,66 +104,94 @@ class _RankingScreenState extends State<RankingScreen> {
               Center(
                 child: Text(
                   "Colaboradores em destaque",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
               SizedBox(height: 16),
               // Cabeçalho responsivo
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        "Colaborador",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        "Pontuação",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
               Divider(thickness: 2),
               // Lista de colaboradores
               // Lista de colaboradores com rolagem própria
-              Container(
-                height: 300, // Aproximadamente 6 itens visíveis
-                child: ListView.builder(
-                  itemCount: colaboradores.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            // backgroundImage: AssetImage(
-                            //   colaboradores[index]["imagem"] ?? 'assets/placeholder.png',
-                            // ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Cabeçalho
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 8.0,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'Colaborador',
+                            style: GoogleFonts.akatab(fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(width: 12),
-                          Expanded(
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Center(
                             child: Text(
-                              colaboradores[index].nome,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
+                              'Pontuação',
+                              style: GoogleFonts.akatab(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          _getMedal(index),
-                          SizedBox(width: 12),
-                          Text("${colaboradores[index].pontuacao}"),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Divider(),
+
+                  // Lista de Colaboradores
+                  Container(
+                    height: 300,
+                    child: ListView.builder(
+                      itemCount: colaboradores.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.0,
+                            horizontal: 10.0,
+                          ),
+                          child: Row(
+                            children: [
+                              CircleAvatar(radius: 20),
+                              SizedBox(width: 12),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  colaboradores[index].nome,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: GoogleFonts.kufam(),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _getMedal(index),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      "${colaboradores[index].pontuacao}",
+                                      style: GoogleFonts.kufam(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
 
               SizedBox(height: 24),
@@ -187,7 +219,7 @@ class _RankingScreenState extends State<RankingScreen> {
                         Expanded(
                           child: Text(
                             "Missões do mês",
-                            style: TextStyle(
+                            style: GoogleFonts.akatab(
                               color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -199,7 +231,7 @@ class _RankingScreenState extends State<RankingScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => NotificationScreen(),
+                                builder: (context) => MissionScreen(),
                               ),
                             );
                           },
@@ -212,7 +244,7 @@ class _RankingScreenState extends State<RankingScreen> {
                             children: [
                               Text(
                                 "Ver missões",
-                                style: TextStyle(color: Colors.white),
+                                style: GoogleFonts.kufam(color: Colors.white),
                               ),
                               SizedBox(width: 4),
                               Icon(
@@ -236,7 +268,7 @@ class _RankingScreenState extends State<RankingScreen> {
                     SizedBox(height: 8),
                     Text(
                       "Concluídas $missoesConcluidas/$totalMissoes",
-                      style: TextStyle(color: Colors.white),
+                      style: GoogleFonts.akatab(color: Colors.white),
                     ),
                   ],
                 ),
@@ -272,11 +304,11 @@ class _RankingScreenState extends State<RankingScreen> {
                           children: [
                             TextSpan(
                               text: "#INOVAEURO",
-                              style: TextStyle(color: Color(0xFF00358E)),
+                              style: GoogleFonts.akatab(color: Color(0xFF00358E)),
                             ),
                             TextSpan(
                               text: " Transforme ideias em recompensas!",
-                              style: TextStyle(color: Colors.black),
+                              style: GoogleFonts.akatab(color: Colors.black),
                             ),
                           ],
                         ),
@@ -284,7 +316,7 @@ class _RankingScreenState extends State<RankingScreen> {
                       SizedBox(height: 12),
                       RichText(
                         text: TextSpan(
-                          style: TextStyle(fontSize: 16),
+                          style: GoogleFonts.kufam(fontSize: 16),
                           children: [
                             TextSpan(
                               text: "Suas ideias podem valer muito! ",

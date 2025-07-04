@@ -3,8 +3,11 @@ import 'package:europro/login_screens/login_screen.dart';
 import 'package:europro/mission_screens/missions_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
+import 'package:europro/projects_screens/project_kaizen_and_clic_screen.dart';
+import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/rewards_and_missions_screens/rewards_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TitleAndDrawer extends StatelessWidget {
   const TitleAndDrawer({super.key});
@@ -38,7 +41,7 @@ class TitleAndDrawer extends StatelessWidget {
                             SizedBox(height: 12),
                             Text(
                               'Seu Nome',
-                              style: TextStyle(
+                              style: GoogleFonts.kufam(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -46,7 +49,7 @@ class TitleAndDrawer extends StatelessWidget {
                             ),
                             Text(
                               'Seu Email',
-                              style: TextStyle(
+                              style: GoogleFonts.kufam(
                                 color: Colors.black,
                                 fontSize: 14,
                               ),
@@ -71,7 +74,9 @@ class TitleAndDrawer extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
                     leading: Icon(Icons.person),
-                    title: Text('Meu Perfil'),
+                    title: Text('Meu Perfil',
+                    style: GoogleFonts.akatab(),
+                    ),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilScreen()),
                       );
@@ -82,7 +87,8 @@ class TitleAndDrawer extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
                     leading: Icon(Icons.settings),
-                    title: Text('Alterar dados cadastrais'),
+                    title: Text('Alterar dados cadastrais',
+                    style: GoogleFonts.akatab(),),
                     onTap: () {},
                   ),
                 ),
@@ -90,7 +96,8 @@ class TitleAndDrawer extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
                     leading: Icon(Icons.track_changes),
-                    title: Text('Missões'),
+                    title: Text('Missões',
+                    style: GoogleFonts.akatab(),),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => MissionScreen()),
                       );
@@ -101,7 +108,8 @@ class TitleAndDrawer extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
                     leading: Icon(Icons.emoji_events),
-                    title: Text('Minha pontuação'),
+                    title: Text('Minha pontuação',
+                    style: GoogleFonts.akatab(),),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => RewardsScreen()),
                       );
@@ -112,7 +120,8 @@ class TitleAndDrawer extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
                     leading: Icon(Icons.snippet_folder_rounded),
-                    title: Text('Meus projetos'),
+                    title: Text('Meus projetos',
+                    style: GoogleFonts.akatab(),),
                     onTap: () {
                       Navigator.push(
                                 context,
@@ -127,16 +136,22 @@ class TitleAndDrawer extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
                     leading: Icon(Icons.add),
-                    title: Text('Novo projeto'),
-                    onTap: () {},
+                    title: Text('Novo projeto',
+                    style: GoogleFonts.akatab(),),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ProjectKaizenAndClicScreen()));
+                    },
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
                     leading: Icon(Icons.leaderboard),
-                    title: Text('Ranking de colaboradores'),
-                    onTap: () {},
+                    title: Text('Ranking de colaboradores',
+                    style: GoogleFonts.akatab(),),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()));
+                    },
                   ),
                 ),
               ],
@@ -144,7 +159,8 @@ class TitleAndDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.arrow_back),
-            title: Text('Desconectar'),
+            title: Text('Desconectar',
+            style: GoogleFonts.akatab(),),
             onTap: () {
               Navigator.push(
                       context,

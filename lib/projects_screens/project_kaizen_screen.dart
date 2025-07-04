@@ -2,13 +2,15 @@ import 'package:europro/data/repository/controller/project_kaizen_clic_controlle
 import 'package:europro/data/repository/remote_projeto_repository.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
+import 'package:europro/projects_screens/my_projects_screen.dart';
+import 'package:europro/projects_screens/project_kaizen_and_clic_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:io';
 
 class ProjectKaizen extends StatefulWidget {
   const ProjectKaizen({super.key});
@@ -32,8 +34,10 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
+        elevation: 2,
+        shadowColor: Colors.black,
         scrolledUnderElevation: 0,
-        title: Image.asset('images/logoEuroPro.png', height: 40),
+        title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
@@ -46,32 +50,37 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProjectKaizenAndClicScreen()),);
+                  },
                 ),
-                Expanded(
-                  child: RichText(
-                    textAlign: TextAlign.center,
-                    text: const TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Projeto ',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                Padding(
+                 padding: const EdgeInsets.only(left: 18),
+                  child: Expanded(
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text:  TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Projeto ',
+                            style: GoogleFonts.akatab(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: 'Kaizen',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Color(
-                              0xFF00358E,
-                            ), // Cor específica para Kaizen
+                          TextSpan(
+                            text: 'Kaizen',
+                            style: GoogleFonts.akatab(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Color(
+                                0xFF00358E,
+                              ), // Cor específica para Kaizen
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -80,9 +89,9 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
             const SizedBox(height: 20),
 
             // Seção Título
-            const Text(
+            Text(
               'Título',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -98,14 +107,14 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
             const SizedBox(height: 16),
 
             // Seção Descrição
-            const Text(
+            Text(
               'Descrição',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               '${_controllers.descricaoController.text.length}/6000 caracteres',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              style: GoogleFonts.kufam(fontSize: 14, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Stack(
@@ -259,9 +268,14 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                   }
                 },
 
-                child: const Text(
-                  'ENVIAR',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => MyProjects()),
+                    );
+                  },
+                   child: Text('ENVIAR',
+                  style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold,
+                  color: Colors.black),)
                 ),
               ),
             ),

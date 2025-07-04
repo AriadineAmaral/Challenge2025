@@ -5,6 +5,7 @@ import 'package:europro/projects_screens/project_kaizen_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Projects extends StatelessWidget {
   const Projects({super.key});
@@ -16,7 +17,9 @@ class Projects extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        title: Image.asset('images/logoEuroPro.png', height: 40),
+        elevation: 2,
+        shadowColor: Colors.black,
+        title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
       backgroundColor: Colors.white, // fundo branco
@@ -40,15 +43,15 @@ class Projects extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.arrow_back_ios, color: Colors.white),
                     onPressed: () {
-                      Navigator.pop(context);
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()));
                     },
                   ),
                   Expanded(
                     child: Center(
                       child: Text(
                         "Projetos de inovação",
-                        style: TextStyle(
-                          fontSize: 20,
+                        style: GoogleFonts.akatab(
+                          fontSize: 16,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.none,
@@ -81,7 +84,7 @@ class Projects extends StatelessWidget {
                         children: [
                           Text(
                             "Projeto Kaizen",
-                            style: TextStyle(
+                            style: GoogleFonts.akatab(
                               // fontFamily: ,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -93,7 +96,7 @@ class Projects extends StatelessWidget {
                           SizedBox(height: 12),
                           RichText(
                             text: TextSpan(
-                              style: TextStyle(fontSize: 14),
+                              style: GoogleFonts.kufam(fontSize: 14),
                               children: [
                                 TextSpan(
                                   text:
@@ -130,7 +133,7 @@ class Projects extends StatelessWidget {
                             },
                             child: Text(
                               "INSCREVA-SE NO KAIZEN",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: GoogleFonts.akatab(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -153,7 +156,7 @@ class Projects extends StatelessWidget {
                         children: [
                           Text(
                             "Projeto Clic",
-                            style: TextStyle(
+                            style: GoogleFonts.akatab(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF00358E),
@@ -164,7 +167,7 @@ class Projects extends StatelessWidget {
                           SizedBox(height: 12),
                           RichText(
                             text: TextSpan(
-                              style: TextStyle(fontSize: 14),
+                              style: GoogleFonts.kufam(fontSize: 14),
                               children: [
                                 TextSpan(
                                   text:
@@ -203,7 +206,7 @@ class Projects extends StatelessWidget {
                             },
                             child: Text(
                               "INSCREVA-SE NO CLIC",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: GoogleFonts.akatab(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],

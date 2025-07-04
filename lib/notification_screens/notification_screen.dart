@@ -1,6 +1,7 @@
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NotificationScreen extends StatefulWidget {
   // Mudamos para StatefulWidget
@@ -35,18 +36,23 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Notificações',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Text(
+            'Notificações',
+            style: GoogleFonts.akatab(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
         ),
         backgroundColor: const Color(0xFF00358E),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()));
+          },
         ),
       ),
       body: Padding(
@@ -129,7 +135,7 @@ class _NotificacaoItem extends StatelessWidget {
               padding: const EdgeInsets.only(top: 8),
               child: Text(
                 texto,
-                style: const TextStyle(
+                style: GoogleFonts.kufam(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -144,7 +150,7 @@ class _NotificacaoItem extends StatelessWidget {
             right: 0,
             child: Text(
               data,
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
+              style: GoogleFonts.kufam(color: Colors.white70, fontSize: 12),
             ),
           ),
 

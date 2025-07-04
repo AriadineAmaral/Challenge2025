@@ -6,11 +6,7 @@ class ProjectKaizenAndClicScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(), // se tiver
-      appBar: AppBar(
-        title: Text("Projetos de inovação"),
-      ),
+    return Scaffold( // se tiver
       body: Projects(),
     );
   }

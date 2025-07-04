@@ -4,7 +4,9 @@ import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/projects_screens/detail_projects_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
+import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyProjects extends StatefulWidget {
@@ -53,14 +55,15 @@ class _MeusProjetosScreenState extends State<MyProjects> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
+        elevation: 2,
+        shadowColor: Colors.black,
         scrolledUnderElevation: 0,
-        title: const Text(
-          'EuroPro',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
+        title: Image.asset('images/logoEuroPro.png', height: 30),
+        centerTitle: true,
       ),
+      drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -69,17 +72,23 @@ class _MeusProjetosScreenState extends State<MyProjects> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()),);
+                  },
+                  padding: EdgeInsets.only(right: 6),
                 ),
-                const Expanded(
-                  child: Text(
-                    'Meus projetos',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 22),
+                    child: Text(
+                      'Meus projetos',
+                      style: GoogleFonts.akatab(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
@@ -211,7 +220,7 @@ class _ProjetoCard extends StatelessWidget {
                   : projeto.tipoProjeto == 2
                       ? 'Projeto Clic'
                       : 'Projeto desconhecido',
-                  style: const TextStyle(
+                  style: GoogleFonts.akatab(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF00358E),
@@ -224,7 +233,7 @@ class _ProjetoCard extends StatelessWidget {
             // Status
             Text(
               'Status: ${_capitalize(projeto.idStatus == 1 ? 'análise e seleção' : projeto.idStatus == 2 ? 'em desenvolvimento' : 'finalizado')}',
-              style: const TextStyle(fontSize: 14),
+              style: GoogleFonts.kufam(fontSize: 14),
             ),
           ],
         ),

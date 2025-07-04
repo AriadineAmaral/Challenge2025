@@ -4,6 +4,7 @@ import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/rewards_and_missions_screens/rewards_screen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
@@ -13,9 +14,11 @@ class PerfilScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        elevation: 2,
+        shadowColor: Colors.black,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        title: Image.asset('images/logoEuroPro.png', height: 40),
+        title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
@@ -25,7 +28,17 @@ class PerfilScreen extends StatelessWidget {
               padding: const EdgeInsets.only(top: 5, left: 7, right: 16),
               child: Row(
                 children: [
-                  IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: () => Navigator.pop(context)),
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RankingScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   Spacer(),
                 ],
               ),
@@ -35,16 +48,16 @@ class PerfilScreen extends StatelessWidget {
             SizedBox(height: 8),
             Text(
               'editar foto',
-              style: TextStyle(color: Colors.black, fontSize: 14),
+              style: GoogleFonts.kufam(color: Colors.black, fontSize: 14),
             ),
             SizedBox(height: 8),
             Text(
               'Maria Fernandes',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: GoogleFonts.kufam(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
               'maria.fernandes@gmail.com',
-              style: TextStyle(color: Colors.black),
+              style: GoogleFonts.kufam(color: Colors.black),
             ),
             SizedBox(height: 24),
             Padding(
@@ -55,13 +68,23 @@ class PerfilScreen extends StatelessWidget {
                 physics: NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
+                childAspectRatio:
+                    1.2, // Deixa o botão mais "baixinho" (aumente para 1.3 ou mais se quiser mais largo)
                 children: [
-                  _buildProfileButton(Icons.email_outlined, 'alterar\nemail', () {
-                    _showAlterarEmailDialog(context);
-                  }),
-                  _buildProfileButton(Icons.lock_reset_outlined, 'redefinir\nsenha', () {
-                    _showRedefinirSenhaDialog(context);
-                  }),
+                  _buildProfileButton(
+                    Icons.email_outlined,
+                    'alterar\nemail',
+                    () {
+                      _showAlterarEmailDialog(context);
+                    },
+                  ),
+                  _buildProfileButton(
+                    Icons.lock_reset_outlined,
+                    'redefinir\nsenha',
+                    () {
+                      _showRedefinirSenhaDialog(context);
+                    },
+                  ),
                   _buildProfileButton(
                     Icons.emoji_events_outlined,
                     'minha\npontuação',
@@ -74,30 +97,24 @@ class PerfilScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  _buildProfileButton(Icons.assignment_outlined, 'meus\nprojetos', () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MyProjects()),
-                    );
-                  }),
+                  _buildProfileButton(
+                    Icons.assignment_outlined,
+                    'meus\nprojetos',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MyProjects()),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: TextButton.icon(
-                onPressed: () {},
-                icon: Icon(Icons.logout, color: Colors.black),
-                label: Text(
-                  'desconectar',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-            ),
+            SizedBox(height: 10),
           ],
         ),
       ),
+      
       bottomNavigationBar: Container(
         height: 50,
         color: Color(0xFF00358E),
@@ -158,28 +175,31 @@ class PerfilScreen extends StatelessWidget {
   }
 
   Widget _buildProfileButton(IconData icon, String text, VoidCallback onTap) {
-    return ElevatedButton(
+  return SizedBox(
+    width: 80, // Largura menor
+    height: 80, // Altura menor
+    child: ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Color(0xFF00358E),
-        padding: EdgeInsets.all(12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: EdgeInsets.all(4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       onPressed: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white, size: 50),
-          SizedBox(height: 8),
+          Icon(icon, color: Colors.white, size: 24),
+          SizedBox(height: 4),
           Text(
             text,
-            style: TextStyle(color: Colors.white),
+            style: GoogleFonts.kufam(color: Colors.white, fontSize: 11),
             textAlign: TextAlign.center,
           ),
         ],
       ),
-    );
-  }
-
+    ),
+  );
+}
   //funcionalidade do botão de email
   void _showAlterarEmailDialog(BuildContext context) {
     showDialog(

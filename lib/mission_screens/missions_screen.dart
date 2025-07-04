@@ -6,6 +6,7 @@ import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MissionScreen extends StatefulWidget {
@@ -79,8 +80,10 @@ class _MissionScreenState extends State<MissionScreen> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
+        elevation: 2,
+        shadowColor: Colors.black,
         surfaceTintColor: Colors.transparent,
-        title: Image.asset('images/logoEuroPro.png', height: 40),
+        title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
       body: Column(
@@ -104,16 +107,18 @@ class _MissionScreenState extends State<MissionScreen> {
                       Icons.arrow_back_ios,
                       color: Colors.white,
                     ), // Ícone branco
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()));
+                    },
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
                         'Missões do mês',
-                        style: TextStyle(
+                        style:GoogleFonts.akatab(
                           color: Colors.white, // Texto branco
                           fontWeight: FontWeight.bold,
-                          fontSize: 25,
+                          fontSize: 24,
                         ),
                       ),
                     ),
@@ -159,9 +164,9 @@ class _MissionScreenState extends State<MissionScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text(
+              child: Text(
                 'ver minha pontuação',
-                style: TextStyle(
+                style: GoogleFonts.akatab(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -280,14 +285,14 @@ class _MissaoItem extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: GoogleFonts.kufam(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                 ),
                 Text(
                   points,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: GoogleFonts.kufam(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
@@ -305,7 +310,7 @@ class _MissaoItem extends StatelessWidget {
             ),
             child: Text(
               buttonLabel,
-              style: TextStyle(
+              style: GoogleFonts.akatab(
                 color: onButtonPressed == null ? Colors.black54 : Colors.white,
                 fontWeight: FontWeight.bold,
               ),

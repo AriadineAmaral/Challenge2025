@@ -4,7 +4,7 @@ import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 class AccessScreen extends StatefulWidget {
   const AccessScreen({super.key});
@@ -34,12 +34,20 @@ class _AccessScreenState extends State<AccessScreen> {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: TextStyle(fontSize: 45, color: Colors.black),
+                  style: GoogleFonts.akatab(
+                    fontSize: 36,
+                    color: Colors.black,
+                  ),
                   children: <TextSpan>[
                     TextSpan(text: 'Bem-Vindo(a)\n ao '),
                     TextSpan(
                       text: 'EuroPro',
-                      style: TextStyle(color: Color(0xFF00358E)),
+                      style: GoogleFonts.akatab(
+                        color: Color(0xFF00358E),
+                        fontSize: 36, // Mantenha o tamanho consistente
+                        fontWeight:
+                            FontWeight.bold, // Opcional: se quiser negrito
+                      ),
                     ),
                   ],
                 ),
@@ -51,11 +59,11 @@ class _AccessScreenState extends State<AccessScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Email',
-                      style: TextStyle(
+                      style: GoogleFonts.kufam(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -82,11 +90,10 @@ class _AccessScreenState extends State<AccessScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Senha',
-                      style: TextStyle(
+                      style: GoogleFonts.kufam(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -126,16 +133,16 @@ class _AccessScreenState extends State<AccessScreen> {
                 alignment: Alignment.centerLeft,
                 child: TextButton(
                   onPressed: () {},
-                  child: const Text(
+                  child: Text(
                     'Esqueceu sua senha?',
-                    style: TextStyle(color: Color(0xFF00358E)),
+                    style: GoogleFonts.kufam(color: Color(0xFF00358E)),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
               // Botão Entrar
               Button(
-                text: 'Entrar',
+                text:'Entrar',
                 backgroundColor: const Color(0xFFFFF200),
                 textColor: Colors.black,
                 isBold: true,
@@ -146,15 +153,15 @@ class _AccessScreenState extends State<AccessScreen> {
                   if (email.isEmpty || senha.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('⚠️ Por favor, preencha todos os campos',
-                         style: TextStyle(color: Colors.black),
+                        content: Text(
+                          '⚠️ Por favor, preencha todos os campos',
+                          style: TextStyle(color: Colors.black),
                         ),
                         backgroundColor: Color(0xFFFFF200),
                       ),
                     );
                     return;
                   }
-
                   try {
                     final usuarioRepo = RemoteUsuarioRepository(
                       client: Supabase.instance.client,
@@ -166,22 +173,23 @@ class _AccessScreenState extends State<AccessScreen> {
                     );
 
                     if (result) {
-                       Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RankingScreen(),
-                      ),
-                    );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RankingScreen(),
+                        ),
+                      );
                     }
-                   
                   } catch (e) {
                     String mensagemErro = e.toString().replaceAll(
                       'Exception: ',
                       '',
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(mensagemErro,
-                      style: TextStyle(color: Colors.white),
+                      SnackBar(
+                        content: Text(
+                          mensagemErro,
+                          style: TextStyle(color: Colors.white),
                         ),
                         backgroundColor: Colors.red,
                       ),
