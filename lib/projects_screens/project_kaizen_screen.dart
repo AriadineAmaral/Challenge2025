@@ -27,6 +27,78 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
   // final TextEditingController _titleController = TextEditingController();
   // final TextEditingController _descriptionController = TextEditingController();
 
+  //AJEITAR CODIGO SUPABASE PFV, - O CODIGO ADICIONAL PARA RECEBER ESSAS INFORMAÇÕES ESTA NA LINHA 188 A 210.
+
+  final TextEditingController _userSearchController = TextEditingController();
+  List<Map<String, dynamic>> _foundUsers = [];
+
+  Future<void> _searchUsers(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _foundUsers = [];
+      });
+      return;
+    }
+
+    final supabase = Supabase.instance.client;
+
+    try {
+      // 1. Busca por NOME na tabela colaboradores (com relacionamento)
+      final nomeResponse = await supabase
+          .from('colaboradores')
+          .select('''
+          id_colaborador, 
+          nome,
+          usuarios!inner(email, user_id)
+        ''')
+          .ilike('nome', '%$query%'); // Busca parcial (contém o texto)
+
+      // 2. Busca por EMAIL na tabela usuarios (com relacionamento)
+      final emailResponse = await supabase
+          .from('usuarios')
+          .select('''
+          email,
+          user_id,
+          colaboradores!inner(id_colaborador, nome)
+        ''')
+          .ilike('email', '%$query%'); // Busca parcial (contém o texto)
+
+      // Processamento dos resultados
+      final List<Map<String, dynamic>> results = [];
+
+      // Adiciona resultados da busca por nome
+      for (final item in nomeResponse as List) {
+        results.add({
+          'id': item['usuarios']?['user_id'] ?? '',
+          'id_colaborador': item['id_colaborador'] ?? '',
+          'nome': item['nome'] ?? '',
+          'email': item['usuarios']?['email'] ?? '',
+        });
+      }
+
+      // Adiciona resultados da busca por email (evitando duplicados)
+      for (final item in emailResponse as List) {
+        if (!results.any((r) => r['id'] == item['user_id'])) {
+          results.add({
+            'id': item['user_id'] ?? '',
+            'id_colaborador': item['colaboradores']?['id_colaborador'] ?? '',
+            'nome': item['colaboradores']?['nome'] ?? '',
+            'email': item['email'] ?? '',
+          });
+        }
+      }
+
+      setState(() {
+        _foundUsers = results;
+      });
+    } catch (e) {
+      print('Erro na busca de usuários: $e');
+      setState(() {
+        _foundUsers = [];
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,15 +123,20 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProjectKaizenAndClicScreen()),);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProjectKaizenAndClicScreen(),
+                      ),
+                    );
                   },
                 ),
                 Padding(
-                 padding: const EdgeInsets.only(left: 18),
+                  padding: const EdgeInsets.only(left: 18),
                   child: Expanded(
                     child: RichText(
                       textAlign: TextAlign.center,
-                      text:  TextSpan(
+                      text: TextSpan(
                         children: [
                           TextSpan(
                             text: 'Projeto ',
@@ -91,7 +168,10 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
             // Seção Título
             Text(
               'Título',
-              style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.akatab(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -105,11 +185,37 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
               ),
             ),
             const SizedBox(height: 16),
+            // Campo de Adicionar Usuários
+            Text(
+              'Adicionar Participantes',
+              style: GoogleFonts.akatab(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _userSearchController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                hintText: 'Digite o nome ou e-mail do participante',
+                prefixIcon: Icon(Icons.person_add_alt_1),
+              ),
+              onChanged: (value) async {
+                await _searchUsers(value); // Chama a função de busca
+              },
+            ),
+            const SizedBox(height: 16),
 
             // Seção Descrição
             Text(
               'Descrição',
-              style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.akatab(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -194,8 +300,9 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                   if (titulo.isEmpty || descricao.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('⚠️ Por favor, preencha todos os campos',
-                         style: TextStyle(color: Colors.black),
+                        content: Text(
+                          '⚠️ Por favor, preencha todos os campos',
+                          style: TextStyle(color: Colors.black),
                         ),
                         backgroundColor: Color(0xFFFFF200),
                       ),
@@ -270,12 +377,19 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
 
                 child: TextButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => MyProjects()),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyProjects()),
                     );
                   },
-                   child: Text('ENVIAR',
-                  style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold,
-                  color: Colors.black),)
+                  child: Text(
+                    'ENVIAR',
+                    style: GoogleFonts.akatab(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ),
             ),
