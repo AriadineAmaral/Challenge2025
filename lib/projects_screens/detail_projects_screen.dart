@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailProjects extends StatefulWidget {
   final Projeto projeto;
@@ -22,12 +23,36 @@ class DetailProjects extends StatefulWidget {
 class _MyProjectsState extends State<DetailProjects> {
   final projetoRepo = RemoteProjetoRepository(client: Supabase.instance.client);
 
+  @override
+void initState() {
+  super.initState();
+  carregarArquivos(); // Aqui você carrega os arquivos ao abrir a tela
+}
+
+
   String _formataData(DateTime data) {
     return DateFormat('dd/MM/yyyy').format(data);
   }
 
+  Future<void> carregarArquivos() async {
+  try {
+    final resultado = await projetoRepo.buscarArquivosDoProjeto(widget.projeto.idProjeto);
+    setState(() {
+      arquivos = resultado;
+    });
+  } catch (e) {
+    print('Erro ao carregar arquivos: $e');
+  }
+}
+
+
+
+
   List<Projeto> projetos = [];
   bool isLoading = true;
+
+  List<Map<String, dynamic>> arquivos = [];
+
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +168,48 @@ class _MyProjectsState extends State<DetailProjects> {
                 textAlign: TextAlign.center,
               ),
             ),
+          const SizedBox(height: 24),
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  child: Text(
+    'Arquivos anexados:',
+    style: GoogleFonts.akatab(fontSize: 16, fontWeight: FontWeight.bold),
+  ),
+),
+const SizedBox(height: 8),
+...arquivos.map((arquivo) {
+  final nomeArquivo = arquivo['nome_arquivo'];
+  final caminho = arquivo['caminho'];
+
+  return Card(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+    child: ListTile(
+      leading: const Icon(Icons.insert_drive_file),
+      title: Text(nomeArquivo),
+      subtitle: Text(caminho),
+      trailing: Wrap(
+        spacing: 12,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.open_in_new),
+            onPressed: () async {
+              final uri = Uri.parse(caminho);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Não foi possível abrir o arquivo')),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}).toList(),
+
+
           ],
         ),
       ),

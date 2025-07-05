@@ -11,6 +11,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:diacritic/diacritic.dart'; 
+
+
+
 
 class ProjectKaizen extends StatefulWidget {
   const ProjectKaizen({super.key});
@@ -319,7 +323,8 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
 
                     for (final file in _selectedFiles) {
                       final fileBytes = file.bytes;
-                      final fileName = file.name;
+                      final fileName = sanitizeFileName(file.name);
+
 
                       if (fileBytes == null) {
                         print('Arquivo ${file.name} sem bytes, ignorando...');
@@ -364,6 +369,10 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                         backgroundColor: Colors.green,
                       ),
                     );
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => MyProjects()),
+                    );
                   } catch (e) {
                     print('Erro no upload: $e');
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -375,22 +384,15 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                   }
                 },
 
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MyProjects()),
-                    );
-                  },
-                  child: Text(
-                    'ENVIAR',
-                    style: GoogleFonts.akatab(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                child: Text(
+                  'ENVIAR',
+                  style: GoogleFonts.akatab(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
+
               ),
             ),
           ],
@@ -568,4 +570,14 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
       _selectedFiles.removeAt(index);
     });
   }
+
+
+String sanitizeFileName(String fileName) {
+  final cleaned = removeDiacritics(fileName); // remove acentos como ã, ç, etc
+  return cleaned
+      .replaceAll(RegExp(r'[^\w\s.-]'), '') // remove parênteses, %, &, etc
+      .replaceAll(' ', '_') // troca espaços por underline
+      .trim(); // remove espaços do início/fim
+}
+
 }

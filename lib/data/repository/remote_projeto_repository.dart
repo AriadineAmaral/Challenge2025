@@ -82,7 +82,9 @@ Future<int> addProjeto(
       final projetosData = await client
           .from('projetos')
           .select()
-          .inFilter('id_projeto', idsProjeto);
+          .inFilter('id_projeto', idsProjeto)
+          .order('id_projeto', ascending: false);
+
 
 
       final projetos = projetosData.map((e) => Projeto.fromMap(e)).toList();
@@ -92,4 +94,18 @@ Future<int> addProjeto(
       throw Exception('Erro ao buscar projetos: $e');
     }
   }
+  
+  Future<List<Map<String, dynamic>>> buscarArquivosDoProjeto(int idProjeto) async {
+  try {
+    final arquivos = await client
+        .from('arquivos')
+        .select()
+        .eq('id_projeto', idProjeto);
+
+    return List<Map<String, dynamic>>.from(arquivos);
+  } catch (e) {
+    throw Exception('Erro ao buscar arquivos: $e');
+  }
+}
+
 }
