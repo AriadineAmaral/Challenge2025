@@ -36,21 +36,36 @@ class _PerfilScreenState extends State<PerfilScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
-    final res =
-        await Supabase.instance.client
-            .from('colaboradores')
-            .select('foto_url')
-            .eq('user_id', user.id)
-            .single();
+    try {
+      // 1. Buscar o ID do colaborador na tabela 'usuarios'
+      final usuario = await Supabase.instance.client
+          .from('usuarios')
+          .select('id_colaborador')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-    if (res != null && res['foto_url'] != null) {
-      setState(() {
-        _fotoUrl = res['foto_url'];
-      });
+      if (usuario == null || usuario['id_colaborador'] == null) return;
+
+      final idColaborador = usuario['id_colaborador'];
+
+      // 2. Buscar a foto_url na tabela 'colaboradores'
+      final colaborador = await Supabase.instance.client
+          .from('colaboradores')
+          .select('foto_url')
+          .eq('id_colaborador', idColaborador)
+          .maybeSingle();
+
+      if (colaborador != null && colaborador['foto_url'] != null) {
+        setState(() {
+        _fotoUrl = '${colaborador['foto_url']}?v=${DateTime.now().millisecondsSinceEpoch}';
+        });
+      }
+
+    } catch (e) {
+      print('Erro ao carregar foto de perfil: $e');
     }
   }
 
-  // TODO: aqui vão as variáveis, métodos e o build
 
   @override
   Widget build(BuildContext context) {

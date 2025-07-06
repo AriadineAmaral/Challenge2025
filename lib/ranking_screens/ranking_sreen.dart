@@ -158,7 +158,16 @@ class _RankingScreenState extends State<RankingScreen> {
                           ),
                           child: Row(
                             children: [
-                              CircleAvatar(radius: 20),
+                              CircleAvatar(
+                              radius: 20,
+                              backgroundImage: colaboradores[index].fotoUrl != null
+                              ? NetworkImage('${colaboradores[index].fotoUrl!}?v=${DateTime.now().millisecondsSinceEpoch}')
+                              : null,
+                              backgroundColor: Colors.grey[300],
+                              child: colaboradores[index].fotoUrl == null
+                                  ? Icon(Icons.person, color: Colors.white)
+                                  : null,
+                            ),
                               SizedBox(width: 12),
                               Expanded(
                                 flex: 2,

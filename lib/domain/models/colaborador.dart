@@ -4,6 +4,7 @@ class Colaborador {
   final String email;
   final String cpf;
   final int pontuacao;
+  final String? fotoUrl;
 
   Colaborador({
     required this.idColaborador,
@@ -11,6 +12,7 @@ class Colaborador {
     required this.email,
     required this.cpf,
     required this.pontuacao,
+    this.fotoUrl,
   });
 
 
@@ -22,6 +24,7 @@ factory Colaborador.fromMap(Map<String, dynamic> map) {
       email: map['email'],
       cpf: map['cpf'],
       pontuacao: map['pontuacao'],
+      fotoUrl: map['foto_url'],
     );
   }
 
