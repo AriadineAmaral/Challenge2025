@@ -17,11 +17,6 @@ class _AccessScreenState extends State<SignUpScreen> {
   final SignUpControllers _controllers = SignUpControllers();
   bool _esconderSenha = true;
 
-  @override
-  void dispose() {
-    _controllers.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -256,14 +251,6 @@ class _AccessScreenState extends State<SignUpScreen> {
                       final usuarioRepo = RemoteUsuarioRepository(
                         client: Supabase.instance.client,
                       );
-          
-                      // final novoUsuario = Usuario(
-                      //   idColaborador: null,
-                      //   email: email,
-                      //   senha: senha,
-                      // );
-          
-                      //await usuarioRepo.addUsuario(novoUsuario, cpf);
           
                       await usuarioRepo.addUsuario(email, senha, cpf);
           

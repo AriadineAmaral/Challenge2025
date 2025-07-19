@@ -1,3 +1,7 @@
+import 'package:europro/data/repository/controller/perfil_screen_controller.dart';
+import 'package:europro/data/repository/remote_perfil_repository.dart';
+import 'package:europro/data/repository/remote_usuario_repository.dart';
+import 'package:europro/domain/models/Perfil.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
@@ -22,14 +26,31 @@ class PerfilScreen extends StatefulWidget {
 
 class _PerfilScreenState extends State<PerfilScreen> {
   String? _fotoUrl;
-  final RemoteColaboradorRepository _repo = RemoteColaboradorRepository(
+  bool isLoading = true;
+
+  final PerfilScreenController _controllers = PerfilScreenController();
+  final RemoteColaboradorRepository colaboradorRepo =
+      RemoteColaboradorRepository(client: Supabase.instance.client);
+  final RemotePerfilRepository perfilRepo = RemotePerfilRepository(
     client: Supabase.instance.client,
   );
+  Perfil? perfil;
 
   @override
   void initState() {
     super.initState();
     _carregarFotoPerfil();
+    _carregarPerfilUsuario();
+  }
+
+  Future<void> _carregarPerfilUsuario() async {
+    final resultado = await perfilRepo.perfilUsuario();
+    if (mounted) {
+      setState(() {
+        perfil = resultado;
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _carregarFotoPerfil() async {
@@ -38,34 +59,35 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
     try {
       // 1. Buscar o ID do colaborador na tabela 'usuarios'
-      final usuario = await Supabase.instance.client
-          .from('usuarios')
-          .select('id_colaborador')
-          .eq('user_id', user.id)
-          .maybeSingle();
+      final usuario =
+          await Supabase.instance.client
+              .from('usuarios')
+              .select('id_colaborador')
+              .eq('user_id', user.id)
+              .maybeSingle();
 
       if (usuario == null || usuario['id_colaborador'] == null) return;
 
       final idColaborador = usuario['id_colaborador'];
 
       // 2. Buscar a foto_url na tabela 'colaboradores'
-      final colaborador = await Supabase.instance.client
-          .from('colaboradores')
-          .select('foto_url')
-          .eq('id_colaborador', idColaborador)
-          .maybeSingle();
+      final colaborador =
+          await Supabase.instance.client
+              .from('colaboradores')
+              .select('foto_url')
+              .eq('id_colaborador', idColaborador)
+              .maybeSingle();
 
       if (colaborador != null && colaborador['foto_url'] != null) {
         setState(() {
-        _fotoUrl = '${colaborador['foto_url']}?v=${DateTime.now().millisecondsSinceEpoch}';
+          _fotoUrl =
+              '${colaborador['foto_url']}?v=${DateTime.now().millisecondsSinceEpoch}';
         });
       }
-
     } catch (e) {
       print('Erro ao carregar foto de perfil: $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -128,14 +150,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
             SizedBox(height: 8),
             Text(
-              'Maria Fernandes',
+              perfil?.nome ?? '',
               style: GoogleFonts.kufam(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              'maria.fernandes@gmail.com',
+              perfil?.email ?? '',
               style: GoogleFonts.kufam(color: Colors.black),
             ),
             SizedBox(height: 24),
@@ -309,6 +331,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
+                  controller: _controllers.emailAtualController,
                   decoration: InputDecoration(
                     labelText: 'Email atual',
                     hintText: 'Informe o seu email atual',
@@ -317,6 +340,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 ),
                 SizedBox(height: 10),
                 TextField(
+                  controller: _controllers.novoEmailController,
                   decoration: InputDecoration(
                     labelText: 'Novo email',
                     hintText: 'Informe o novo email',
@@ -330,8 +354,57 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.yellow,
                     ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
+                    onPressed: () async {
+                      final emailAtual =
+                          _controllers.emailAtualController.text.trim();
+                      final novoEmail =
+                          _controllers.novoEmailController.text.trim();
+
+                      if (novoEmail.isEmpty || emailAtual.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              '⚠️ Por favor, preencha todos os campos',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Color(0xFFFFF200),
+                          ),
+                        );
+                        return;
+                      }
+
+                      try {
+                        final usuarioRepo = RemoteUsuarioRepository(
+                          client: Supabase.instance.client,
+                        );
+
+                        await usuarioRepo.updateEmail(novoEmail, emailAtual);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'email alterado com sucesso',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Color(0xFF00923E),
+                          ),
+                        );
+                        Navigator.of(context).pop();
+                      } catch (e) {
+                        String mensagemErro = e.toString().replaceAll(
+                          'Exception: ',
+                          '',
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              mensagemErro,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     child: Text(
                       'alterar',
@@ -371,6 +444,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
+                  controller: _controllers.senhaAtualController,
                   decoration: InputDecoration(
                     labelText: 'Senha atual',
                     hintText: 'Informe a sua senha atual',
@@ -379,6 +453,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 ),
                 SizedBox(height: 10),
                 TextField(
+                  controller: _controllers.novaSenhaController,
                   decoration: InputDecoration(
                     labelText: 'Nova senha',
                     hintText: 'Informe a sua nova senha',
@@ -387,6 +462,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 ),
                 SizedBox(height: 10),
                 TextField(
+                  controller: _controllers.confirmarSenhaController,
                   decoration: InputDecoration(
                     labelText: 'Confirme a nova senha',
                     hintText: 'Confirme a nova senha',
@@ -400,8 +476,61 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.yellow,
                     ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
+                    onPressed: () async {
+                      final novaSenha =
+                          _controllers.novaSenhaController.text.trim();
+                      final senhaAntiga =
+                          _controllers.senhaAtualController.text.trim();
+                      final confirmarSenha =
+                          _controllers.confirmarSenhaController.text.trim();
+
+                      if (confirmarSenha.isEmpty ||
+                          novaSenha.isEmpty ||
+                          senhaAntiga.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              '⚠️ Por favor, preencha todos os campos',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Color(0xFFFFF200),
+                          ),
+                        );
+                        return;
+                      }
+
+                      try {
+                        final usuarioRepo = RemoteUsuarioRepository(
+                          client: Supabase.instance.client,
+                        );
+
+                        await usuarioRepo.updateSenha(novaSenha, senhaAntiga);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Senha alterada com sucesso',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Color(0xFF00923E),
+                          ),
+                        );
+                        Navigator.of(context).pop();
+                      } catch (e) {
+                        String mensagemErro = e.toString().replaceAll(
+                          'Exception: ',
+                          '',
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              mensagemErro,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     child: Text(
                       'redefinir',
@@ -416,43 +545,41 @@ class _PerfilScreenState extends State<PerfilScreen> {
       },
     );
   }
+
   Future<void> _editarFoto(BuildContext context) async {
-  final picker = ImagePicker();
+    final picker = ImagePicker();
 
-  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-  if (pickedFile == null) return;
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) return;
 
-  try {
-    String publicUrl;
+    try {
+      String publicUrl;
 
-          if (kIsWeb) {
-          // Web: usa bytes direto lendo async
-          final bytes = await pickedFile.readAsBytes();
-          publicUrl = await _repo.uploadFotoPerfil(bytes);
-        } else {
-          // Mobile: cria um File e passa para upload
-          final file = File(pickedFile.path!);
-          publicUrl = await _repo.uploadFotoPerfil(file);
-        }
+      if (kIsWeb) {
+        // Web: usa bytes direto lendo async
+        final bytes = await pickedFile.readAsBytes();
+        publicUrl = await colaboradorRepo.uploadFotoPerfil(bytes);
+      } else {
+        // Mobile: cria um File e passa para upload
+        final file = File(pickedFile.path!);
+        publicUrl = await colaboradorRepo.uploadFotoPerfil(file);
+      }
 
+      await colaboradorRepo.atualizarFotoUrl(publicUrl);
 
-    await _repo.atualizarFotoUrl(publicUrl);
+      setState(() {
+        _fotoUrl = publicUrl;
+      });
 
-    setState(() {
-      _fotoUrl = publicUrl;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Foto atualizada com sucesso!')),
-    );
-  } catch (e, stackTrace) {
-    print('Erro ao atualizar foto: $e');
-    print(stackTrace);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao atualizar foto: $e')),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Foto atualizada com sucesso!')),
+      );
+    } catch (e, stackTrace) {
+      print('Erro ao atualizar foto: $e');
+      print(stackTrace);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao atualizar foto: $e')));
+    }
   }
-}
-
-
 }

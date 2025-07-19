@@ -1,10 +1,13 @@
+import 'package:europro/data/repository/remote_notificacao_repository.dart';
+import 'package:europro/domain/models/notificacao.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationScreen extends StatefulWidget {
-  // Mudamos para StatefulWidget
   const NotificationScreen({super.key});
 
   @override
@@ -12,23 +15,33 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  // Lista de notificações que pode ser modificada
-  final List<Map<String, String>> _notificacoes = [
-    {
-      'texto': 'Parabéns, você acaba de concluir mais uma missão!',
-      'data': '30/04/2025',
-    },
-    {'texto': 'Veja as novidades da Eurofarma', 'data': '25/04/2025'},
-    {
-      'texto': 'Parabéns, você acaba de concluir mais uma missão!',
-      'data': '17/04/2025',
-    },
-  ];
+  final notificaocesRepo = RemoteNotificacaoRepository(
+    client: Supabase.instance.client,
+  );
+
+  List<Notificacao> notificacoes = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _listNotificacoes();
+  }
+
+  void _listNotificacoes() async {
+    final resultado = await notificaocesRepo.listNotificacoes();
+    if (mounted) {
+      setState(() {
+        notificacoes = resultado;
+        isLoading = false;
+      });
+    }
+  }
 
   // Função para remover notificação
   void _removerNotificacao(int index) {
     setState(() {
-      _notificacoes.removeAt(index);
+      notificacoes.removeAt(index);
     });
   }
 
@@ -51,7 +64,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RankingScreen()),
+            );
           },
         ),
       ),
@@ -59,15 +75,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: const EdgeInsets.all(12),
         child: ListView.builder(
           // Usamos ListView.builder para lista dinâmica
-          itemCount: _notificacoes.length,
+          itemCount: notificacoes.length,
           itemBuilder: (context, index) {
             return _NotificacaoItem(
-              texto: _notificacoes[index]['texto']!,
-              data: _notificacoes[index]['data']!,
-              onRemover:
-                  () => _removerNotificacao(
-                    index,
-                  ), // Passamos a função de remover
+              texto: notificacoes[index].conteudo,
+              data:
+                  DateFormat(
+                    'dd/MM/yyyy',
+                  ).format(notificacoes[index].data).toString(),
+              onRemover: () async {
+                 notificaocesRepo.deleteNotificacao(
+                  notificacoes[index].idNotificacao,
+                );
+                _removerNotificacao(index);
+              },
             );
           },
         ),
@@ -123,7 +144,7 @@ class _NotificacaoItem extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       height: 100,
       decoration: BoxDecoration(
-        color: const Color(0xFF00358E),
+        color: const Color(0xFF007BFF),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Stack(

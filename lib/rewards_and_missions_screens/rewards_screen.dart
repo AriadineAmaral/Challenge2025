@@ -93,49 +93,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
     List<Map<String, String>> historicoFormatado = historico(
       historicoPontuacao,
     );
-    // final List<Map<String, String>> missoes = [
-    //   {
-    //     "pontos": "+ 8 pts",
-    //     "descricao": "Missão concluída",
-    //     "expira": "Expira em 30/10/2025",
-    //   },
-    //   {
-    //     "pontos": "+ 15 pts",
-    //     "descricao": "Missão concluída",
-    //     "expira": "Expira em 17/10/2025",
-    //   },
-    //   {
-    //     "pontos": "- 18 pts",
-    //     "descricao": "Missão concluída",
-    //     "expira": "Expirado em 12/07/2025",
-    //   },
-    //   {
-    //     "pontos": "+ 20 pts",
-    //     "descricao": "Missão concluída",
-    //     "expira": "Expira em 5/10/2025",
-    //   },
-    //   {
-    //     "pontos": "+ 50 pts",
-    //     "descricao": "Inscrição Kaizen",
-    //     "expira": "Expira em 5/09/2025",
-    //   },
-    //   {
-    //     "pontos": "- 5 pts",
-    //     "descricao": "Missão concluída",
-    //     "expira": "Expira em 25/08/2025",
-    //   },
-    //   {
-    //     "pontos": "+ 100 pts",
-    //     "descricao": "Inscrição Clic",
-    //     "expira": "Expira em 15/07/2025",
-    //   },
-    //   {
-    //     "pontos": "- 12 pts",
-    //     "descricao": "Missão concluída",
-    //     "expira": "Expirado em 8/07/2025",
-    //   },
-    // ];
-
+    
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -256,7 +214,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                                   color:
                                       isNegative
                                           ? Colors.red
-                                          : const Color(0xFF00358E),
+                                          : const Color(0xFF007BFF),
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,

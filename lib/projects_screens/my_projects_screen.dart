@@ -33,7 +33,6 @@ class _MeusProjetosScreenState extends State<MyProjects> {
   }
 
   Future<void> _findProjetos() async {
-    print('userID: ${Supabase.instance.client.auth.currentUser?.id}');
 
     try {
       final resultado = await projetoRepo.listProjetosColaborador();

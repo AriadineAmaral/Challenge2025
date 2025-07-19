@@ -26,6 +26,7 @@ class _RankingScreenState extends State<RankingScreen> {
   final missoesRepo = RemoteMissaoRepository(client: Supabase.instance.client);
 
   int missoesConcluidas = 0;
+  int missoesDisponivel = 0;
 
   List<Colaborador> colaboradores = [];
   bool isLoading = true;
@@ -35,14 +36,24 @@ class _RankingScreenState extends State<RankingScreen> {
     super.initState();
     _findColaboradores();
     _carregarMissoesConcluidas();
+    _carregarMissoesDisponiveis();
   }
 
   void _carregarMissoesConcluidas() async {
     final resultado = await missoesRepo.countMissaoColaborador();
-    print('🔎 Resultado da contagem de missões concluídas: $resultado');
     if (mounted) {
       setState(() {
         missoesConcluidas = resultado;
+        isLoading = false;
+      });
+    }
+  }
+
+  void _carregarMissoesDisponiveis() async {
+    final resultado = await missoesRepo.countMissaoDisponivel();
+    if (mounted) {
+      setState(() {
+        missoesDisponivel = resultado;
         isLoading = false;
       });
     }
@@ -81,9 +92,9 @@ class _RankingScreenState extends State<RankingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    int totalMissoes = 5;
-    double progresso = missoesConcluidas / totalMissoes;
-    print(missoesConcluidas);
+   double progresso = (missoesDisponivel > 0)
+    ? missoesConcluidas / missoesDisponivel
+    : 0.0;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -104,7 +115,10 @@ class _RankingScreenState extends State<RankingScreen> {
               Center(
                 child: Text(
                   "Colaboradores em destaque",
-                  style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.akatab(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               SizedBox(height: 16),
@@ -127,7 +141,9 @@ class _RankingScreenState extends State<RankingScreen> {
                           flex: 2,
                           child: Text(
                             'Colaborador',
-                            style: GoogleFonts.akatab(fontWeight: FontWeight.bold),
+                            style: GoogleFonts.akatab(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         Expanded(
@@ -135,7 +151,9 @@ class _RankingScreenState extends State<RankingScreen> {
                           child: Center(
                             child: Text(
                               'Pontuação',
-                              style: GoogleFonts.akatab(fontWeight: FontWeight.bold),
+                              style: GoogleFonts.akatab(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -159,15 +177,22 @@ class _RankingScreenState extends State<RankingScreen> {
                           child: Row(
                             children: [
                               CircleAvatar(
-                              radius: 20,
-                              backgroundImage: colaboradores[index].fotoUrl != null
-                              ? NetworkImage('${colaboradores[index].fotoUrl!}?v=${DateTime.now().millisecondsSinceEpoch}')
-                              : null,
-                              backgroundColor: Colors.grey[300],
-                              child: colaboradores[index].fotoUrl == null
-                                  ? Icon(Icons.person, color: Colors.white)
-                                  : null,
-                            ),
+                                radius: 20,
+                                backgroundImage:
+                                    colaboradores[index].fotoUrl != null
+                                        ? NetworkImage(
+                                          '${colaboradores[index].fotoUrl!}?v=${DateTime.now().millisecondsSinceEpoch}',
+                                        )
+                                        : null,
+                                backgroundColor: Colors.grey[300],
+                                child:
+                                    colaboradores[index].fotoUrl == null
+                                        ? Icon(
+                                          Icons.person,
+                                          color: Colors.white,
+                                        )
+                                        : null,
+                              ),
                               SizedBox(width: 12),
                               Expanded(
                                 flex: 2,
@@ -276,7 +301,7 @@ class _RankingScreenState extends State<RankingScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      "Concluídas $missoesConcluidas/$totalMissoes",
+                      "Concluídas $missoesConcluidas/$missoesDisponivel",
                       style: GoogleFonts.akatab(color: Colors.white),
                     ),
                   ],
@@ -313,7 +338,9 @@ class _RankingScreenState extends State<RankingScreen> {
                           children: [
                             TextSpan(
                               text: "#INOVAEURO",
-                              style: GoogleFonts.akatab(color: Color(0xFF00358E)),
+                              style: GoogleFonts.akatab(
+                                color: Color(0xFF00358E),
+                              ),
                             ),
                             TextSpan(
                               text: " Transforme ideias em recompensas!",

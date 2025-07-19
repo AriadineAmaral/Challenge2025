@@ -10,9 +10,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:diacritic/diacritic.dart'; 
+import 'package:diacritic/diacritic.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
-
 
 class ProjectClic extends StatefulWidget {
   const ProjectClic({super.key});
@@ -22,7 +21,7 @@ class ProjectClic extends StatefulWidget {
 }
 
 class _ProjectClicState extends State<ProjectClic> {
-  final List<PlatformFile> _selectedFiles = []; 
+  final List<PlatformFile> _selectedFiles = [];
   final ProjectKaizenClicControllers _controllers =
       ProjectKaizenClicControllers();
 
@@ -50,7 +49,12 @@ class _ProjectClicState extends State<ProjectClic> {
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProjectKaizenAndClicScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProjectKaizenAndClicScreen(),
+                      ),
+                    );
                   },
                 ),
                 Padding(
@@ -88,7 +92,10 @@ class _ProjectClicState extends State<ProjectClic> {
             // Seção Título
             Text(
               'Título',
-              style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.akatab(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -106,7 +113,10 @@ class _ProjectClicState extends State<ProjectClic> {
             // Seção Descrição
             Text(
               'Descrição',
-              style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.akatab(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -191,8 +201,9 @@ class _ProjectClicState extends State<ProjectClic> {
                   if (titulo.isEmpty || descricao.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('⚠️ Por favor, preencha todos os campos',
-                        style: TextStyle(color: Colors.black),
+                        content: Text(
+                          '⚠️ Por favor, preencha todos os campos',
+                          style: TextStyle(color: Colors.black),
                         ),
                         backgroundColor: Color(0xFFFFF200),
                       ),
@@ -211,14 +222,12 @@ class _ProjectClicState extends State<ProjectClic> {
                       final fileBytes = file.bytes;
                       final fileName = sanitizeFileName(file.name);
 
-
                       if (fileBytes == null) {
                         print('Arquivo ${file.name} sem bytes, ignorando...');
                         continue;
                       }
 
-                     final storagePath = 'projetos/$idProjeto/$fileName';
-
+                      final storagePath = 'projetos/$idProjeto/$fileName';
 
                       print('Fazendo upload do arquivo: $fileName');
 
@@ -252,16 +261,16 @@ class _ProjectClicState extends State<ProjectClic> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                          'Inscrição finalizada com sucesso!',
-                        ),
+                        content: Text('Inscrição finalizada com sucesso!'),
                         backgroundColor: Colors.green,
                       ),
-                      
                     );
-                      Navigator.pushReplacement(
+
+                    Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => MyProjects()),
+                      MaterialPageRoute(
+                        builder: (context) => const MyProjects(),
+                      ),
                     );
                   } catch (e) {
                     print('Erro no upload: $e');
@@ -275,7 +284,10 @@ class _ProjectClicState extends State<ProjectClic> {
                 },
                 child: Text(
                   'ENVIAR',
-                  style: GoogleFonts.akatab(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.akatab(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -455,11 +467,12 @@ class _ProjectClicState extends State<ProjectClic> {
       _selectedFiles.removeAt(index);
     });
   }
+
   String sanitizeFileName(String fileName) {
-  final cleaned = removeDiacritics(fileName); // remove acentos como ã, ç, etc
-  return cleaned
-      .replaceAll(RegExp(r'[^\w\s.-]'), '') // remove parênteses, %, &, etc
-      .replaceAll(' ', '_') // troca espaços por underline
-      .trim(); // remove espaços do início/fim
-}
+    final cleaned = removeDiacritics(fileName); // remove acentos como ã, ç, etc
+    return cleaned
+        .replaceAll(RegExp(r'[^\w\s.-]'), '') // remove parênteses, %, &, etc
+        .replaceAll(' ', '_') // troca espaços por underline
+        .trim(); // remove espaços do início/fim
   }
+}

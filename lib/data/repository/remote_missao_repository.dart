@@ -61,8 +61,6 @@ class RemoteMissaoRepository implements MissaoRepository {
 
       final missoes = result.map((e) => ColaboradorMissao.fromMap(e)).toList();
 
-      print(missoes);
-
       return missoes;
     } catch (e) {
       throw Exception('Erro ao buscar missões: $e');
@@ -87,7 +85,6 @@ class RemoteMissaoRepository implements MissaoRepository {
 
       final colaboradorId = usuario['id_colaborador'];
 
-
       final resultado = await client
           .from('colaboradores_missoes')
           .select('*')
@@ -100,24 +97,24 @@ class RemoteMissaoRepository implements MissaoRepository {
           'id_missao': idMissao,
         });
 
-           final colaborador = await client
-          .from('colaboradores')
-          .select('pontos')
-          .eq('id_colaborador', colaboradorId)
-          .maybeSingle();
+        final colaborador =
+            await client
+                .from('colaboradores')
+                .select('pontos')
+                .eq('id_colaborador', colaboradorId)
+                .maybeSingle();
 
-      if (colaborador == null) {
-        print('Colaborador não encontrado');
-        return;
-      }
+        if (colaborador == null) {
+          return;
+        }
 
         final pontosAtuais = colaborador['pontos'] ?? 0;
         final novoTotal = pontosAtuais + pontos;
 
-      await client
-          .from('colaboradores')
-          .update({'pontos': novoTotal})
-          .eq('id_colaborador', colaboradorId);
+        await client
+            .from('colaboradores')
+            .update({'pontos': novoTotal})
+            .eq('id_colaborador', colaboradorId);
       }
     } catch (e) {
       rethrow;
@@ -158,6 +155,21 @@ class RemoteMissaoRepository implements MissaoRepository {
           }).length;
 
       return count;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<int> countMissaoDisponivel() async {
+    try {
+      final resultado = await client
+          .from('missoes')
+          .select('*')
+          .eq('disponivel', true);
+
+      final lista = resultado.map((e) => Missao.fromMap(e)).toList();
+      return lista.length;
     } catch (e) {
       rethrow;
     }

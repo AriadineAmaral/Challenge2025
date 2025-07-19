@@ -8,51 +8,65 @@ class RemoteProjetoRepository implements ProjetoRepository {
   RemoteProjetoRepository({required this.client});
 
   @override
-Future<int> addProjeto(
-  String titulo,
-  String descricao,
-  String tipoProjeto,
-) async {
-  try {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
+  Future<int> addProjeto(
+    String titulo,
+    String descricao,
+    String tipoProjeto, {
+    List<int>? idColaboradores, 
+  }) async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
 
-    final usuario = await Supabase.instance.client
-        .from('usuarios')
-        .select('id_colaborador')
-        .eq('user_id', userId.toString())
-        .maybeSingle();
+      final usuario =
+          await Supabase.instance.client
+              .from('usuarios')
+              .select('id_colaborador')
+              .eq('user_id', userId.toString())
+              .maybeSingle();
 
-    if (usuario != null) {
-      final colaboradorId = usuario['id_colaborador'];
+      if (usuario == null) {
+        throw Exception('Usuário não encontrado');
+      }
 
-      final projetoInserido = await client
-          .from('projetos')
-          .insert({
-            'titulo': titulo,
-            'descricao': descricao,
-            'data_inicio': DateTime.now().toIso8601String(),
-            'tipo_projeto': tipoProjeto,
-            'id_status_projetos': 1,
-          })
-          .select('id_projeto')
-          .single();
+      final colaboradorLogadoId = usuario['id_colaborador'];
+
+      final projetoInserido =
+          await client
+              .from('projetos')
+              .insert({
+                'titulo': titulo,
+                'descricao': descricao,
+                'data_inicio': DateTime.now().toIso8601String(),
+                'tipo_projeto': tipoProjeto,
+                'id_status_projetos': 1,
+              })
+              .select('id_projeto')
+              .single();
 
       final idProjeto = projetoInserido['id_projeto'];
 
-      await client.from('inscricoes_projetos').insert({
-        'id_colaborador': colaboradorId,
+      final inscricoes = <Map<String, dynamic>>[];
+
+      inscricoes.add({
+        'id_colaborador': colaboradorLogadoId,
         'id_projeto': idProjeto,
       });
 
-      return idProjeto;
-    } else {
-      throw Exception('Usuário não encontrado');
-    }
-  } catch (e) {
-    throw Exception('Erro ao enviar inscrição: $e');
-  }
-}
+      if (idColaboradores != null && idColaboradores.isNotEmpty) {
+        for (final id in idColaboradores) {
+          if (id != colaboradorLogadoId) {
+            inscricoes.add({'id_colaborador': id, 'id_projeto': idProjeto});
+          }
+        }
+      }
 
+      await client.from('inscricoes_projetos').insert(inscricoes);
+
+      return idProjeto;
+    } catch (e) {
+      throw Exception('Erro ao enviar inscrição: $e');
+    }
+  }
 
   @override
   Future<List<Projeto>> listProjetosColaborador() async {
@@ -85,8 +99,6 @@ Future<int> addProjeto(
           .inFilter('id_projeto', idsProjeto)
           .order('id_projeto', ascending: false);
 
-
-
       final projetos = projetosData.map((e) => Projeto.fromMap(e)).toList();
 
       return projetos;
@@ -94,18 +106,19 @@ Future<int> addProjeto(
       throw Exception('Erro ao buscar projetos: $e');
     }
   }
-  
-  Future<List<Map<String, dynamic>>> buscarArquivosDoProjeto(int idProjeto) async {
-  try {
-    final arquivos = await client
-        .from('arquivos')
-        .select()
-        .eq('id_projeto', idProjeto);
 
-    return List<Map<String, dynamic>>.from(arquivos);
-  } catch (e) {
-    throw Exception('Erro ao buscar arquivos: $e');
+  Future<List<Map<String, dynamic>>> buscarArquivosDoProjeto(
+    int idProjeto,
+  ) async {
+    try {
+      final arquivos = await client
+          .from('arquivos')
+          .select()
+          .eq('id_projeto', idProjeto);
+
+      return List<Map<String, dynamic>>.from(arquivos);
+    } catch (e) {
+      throw Exception('Erro ao buscar arquivos: $e');
+    }
   }
-}
-
 }

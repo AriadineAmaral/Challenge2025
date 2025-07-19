@@ -6,4 +6,5 @@ abstract class MissaoRepository {
   Future<List<ColaboradorMissao>> listColaboradorMissoes();
   Future<void> concluirMissao(int idMissao, int pontos);
   Future<int> countMissaoColaborador();
+  Future<int> countMissaoDisponivel();
 }

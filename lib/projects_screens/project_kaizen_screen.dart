@@ -1,5 +1,7 @@
 import 'package:europro/data/repository/controller/project_kaizen_clic_controllers.dart';
+import 'package:europro/data/repository/remote_perfil_repository.dart';
 import 'package:europro/data/repository/remote_projeto_repository.dart';
+import 'package:europro/domain/models/Perfil.dart';
 import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
@@ -11,10 +13,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:diacritic/diacritic.dart'; 
-
-
-
+import 'package:diacritic/diacritic.dart';
 
 class ProjectKaizen extends StatefulWidget {
   const ProjectKaizen({super.key});
@@ -28,83 +27,51 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
       ProjectKaizenClicControllers();
 
   final List<PlatformFile> _selectedFiles = [];
-  // final TextEditingController _titleController = TextEditingController();
-  // final TextEditingController _descriptionController = TextEditingController();
+  bool isLoading = true;
+  List<Perfil> perfis = [];
+  List<Perfil> perfisFiltrados = [];
+  List<Perfil> participantesSelecionados = [];
 
-  //AJEITAR CODIGO SUPABASE PFV, - O CODIGO ADICIONAL PARA RECEBER ESSAS INFORMAÇÕES ESTA NA LINHA 188 A 210.
+  final perfilRepo = RemotePerfilRepository(client: Supabase.instance.client);
 
-  final TextEditingController _userSearchController = TextEditingController();
-  List<Map<String, dynamic>> _foundUsers = [];
+  @override
+  void initState() {
+    super.initState();
+    _listUsuarios();
+  }
 
-  Future<void> _searchUsers(String query) async {
-    if (query.isEmpty) {
+  void _listUsuarios() async {
+    final resultado = await perfilRepo.listUsuarios();
+    if (mounted) {
       setState(() {
-        _foundUsers = [];
-      });
-      return;
-    }
-
-    final supabase = Supabase.instance.client;
-
-    try {
-      // 1. Busca por NOME na tabela colaboradores (com relacionamento)
-      final nomeResponse = await supabase
-          .from('colaboradores')
-          .select('''
-          id_colaborador, 
-          nome,
-          usuarios!inner(email, user_id)
-        ''')
-          .ilike('nome', '%$query%'); // Busca parcial (contém o texto)
-
-      // 2. Busca por EMAIL na tabela usuarios (com relacionamento)
-      final emailResponse = await supabase
-          .from('usuarios')
-          .select('''
-          email,
-          user_id,
-          colaboradores!inner(id_colaborador, nome)
-        ''')
-          .ilike('email', '%$query%'); // Busca parcial (contém o texto)
-
-      // Processamento dos resultados
-      final List<Map<String, dynamic>> results = [];
-
-      // Adiciona resultados da busca por nome
-      for (final item in nomeResponse as List) {
-        results.add({
-          'id': item['usuarios']?['user_id'] ?? '',
-          'id_colaborador': item['id_colaborador'] ?? '',
-          'nome': item['nome'] ?? '',
-          'email': item['usuarios']?['email'] ?? '',
-        });
-      }
-
-      // Adiciona resultados da busca por email (evitando duplicados)
-      for (final item in emailResponse as List) {
-        if (!results.any((r) => r['id'] == item['user_id'])) {
-          results.add({
-            'id': item['user_id'] ?? '',
-            'id_colaborador': item['colaboradores']?['id_colaborador'] ?? '',
-            'nome': item['colaboradores']?['nome'] ?? '',
-            'email': item['email'] ?? '',
-          });
-        }
-      }
-
-      setState(() {
-        _foundUsers = results;
-      });
-    } catch (e) {
-      print('Erro na busca de usuários: $e');
-      setState(() {
-        _foundUsers = [];
+        perfis = resultado;
+        perfisFiltrados = resultado;
+        isLoading = false;
       });
     }
   }
 
+  void listColaboradores(String query) {
+    final resultado =
+        perfis.where((colab) {
+          final nome = colab.nome.toLowerCase();
+          final email = colab.email.toLowerCase(); // se existir
+          final termo = query.toLowerCase();
+          return nome.contains(termo) || email.contains(termo);
+        }).toList();
+
+    setState(() {
+      perfisFiltrados = resultado;
+    });
+  }
+
+  //_foundUsers
+  final TextEditingController _userSearchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    final temTextoDigitado = _userSearchController.text.trim().isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -208,11 +175,102 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                 prefixIcon: Icon(Icons.person_add_alt_1),
               ),
               onChanged: (value) async {
-                await _searchUsers(value); // Chama a função de busca
+                listColaboradores(value); // Chama a função de busca
               },
             ),
             const SizedBox(height: 16),
 
+            if (temTextoDigitado && perfisFiltrados.isEmpty)
+              Text('Nenhum colaborador encontrado.')
+            else if (temTextoDigitado)
+              SizedBox(
+                height: 180,
+                child: Scrollbar(
+                  thumbVisibility: true,
+                  child: ListView.builder(
+                    itemCount: perfisFiltrados.length,
+                    itemBuilder: (context, index) {
+                      final colaborador = perfisFiltrados[index];
+                      return ListTile(
+                        leading: Icon(Icons.person),
+                        title: Text(colaborador.nome),
+                        subtitle: Text(colaborador.email),
+                        onTap: () {
+                          if (participantesSelecionados.length < 2 &&
+                              !participantesSelecionados.contains(
+                                colaborador,
+                              )) {
+                            setState(() {
+                              participantesSelecionados.add(colaborador);
+                              _userSearchController.clear();
+                              perfisFiltrados.clear();
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  '⚠️ Máximo de 2 participantes permitido',
+                                ),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+            if (participantesSelecionados.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(
+                'Participantes Selecionados:',
+                style: GoogleFonts.akatab(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children:
+                    participantesSelecionados.map((perfil) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFE6F0FF),
+                          border: Border.all(color: Color(0xFF00358E)),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(perfil.nome, style: GoogleFonts.kufam()),
+                            const SizedBox(width: 6),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  participantesSelecionados.remove(perfil);
+                                });
+                              },
+                              child: Icon(
+                                Icons.remove_circle,
+                                color: Colors.redAccent,
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+              ),
+            ],
+            const SizedBox(height: 16),
             // Seção Descrição
             Text(
               'Descrição',
@@ -315,16 +373,35 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                   }
 
                   try {
-                    final idProjeto = await projetoRepo.addProjeto(
-                      titulo,
-                      descricao,
-                      '1',
-                    );
+                    final int idProjeto;
+
+                    if (participantesSelecionados.isNotEmpty) {
+                      List<int> idColaboradores = [];
+                      for (
+                        var i = 0;
+                        i < participantesSelecionados.length;
+                        i++
+                      ) {
+                        idColaboradores.add(participantesSelecionados[i].id);
+                      }
+
+                       idProjeto = await projetoRepo.addProjeto(
+                        titulo,
+                        descricao,
+                        '1',
+                        idColaboradores: idColaboradores,
+                      );
+                    } else {
+                       idProjeto = await projetoRepo.addProjeto(
+                        titulo,
+                        descricao,
+                        '1',
+                      );
+                    }
 
                     for (final file in _selectedFiles) {
                       final fileBytes = file.bytes;
                       final fileName = sanitizeFileName(file.name);
-
 
                       if (fileBytes == null) {
                         print('Arquivo ${file.name} sem bytes, ignorando...');
@@ -369,9 +446,11 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                         backgroundColor: Colors.green,
                       ),
                     );
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => MyProjects()),
+                      MaterialPageRoute(
+                        builder: (context) => const MyProjects(),
+                      ),
                     );
                   } catch (e) {
                     print('Erro no upload: $e');
@@ -392,7 +471,6 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                     color: Colors.black,
                   ),
                 ),
-
               ),
             ),
           ],
@@ -571,13 +649,11 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
     });
   }
 
-
-String sanitizeFileName(String fileName) {
-  final cleaned = removeDiacritics(fileName); // remove acentos como ã, ç, etc
-  return cleaned
-      .replaceAll(RegExp(r'[^\w\s.-]'), '') // remove parênteses, %, &, etc
-      .replaceAll(' ', '_') // troca espaços por underline
-      .trim(); // remove espaços do início/fim
-}
-
+  String sanitizeFileName(String fileName) {
+    final cleaned = removeDiacritics(fileName); // remove acentos como ã, ç, etc
+    return cleaned
+        .replaceAll(RegExp(r'[^\w\s.-]'), '') // remove parênteses, %, &, etc
+        .replaceAll(' ', '_') // troca espaços por underline
+        .trim(); // remove espaços do início/fim
+  }
 }

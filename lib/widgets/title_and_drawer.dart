@@ -8,6 +8,7 @@ import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/rewards_and_missions_screens/rewards_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TitleAndDrawer extends StatelessWidget {
   const TitleAndDrawer({super.key});
@@ -89,7 +90,10 @@ class TitleAndDrawer extends StatelessWidget {
                     leading: Icon(Icons.settings),
                     title: Text('Alterar dados cadastrais',
                     style: GoogleFonts.akatab(),),
-                    onTap: () {},
+                    onTap: () {
+                       Navigator.push(context, MaterialPageRoute(builder: (context) => PerfilScreen()),
+                      );
+                    },
                   ),
                 ),
                 Padding(
@@ -161,13 +165,14 @@ class TitleAndDrawer extends StatelessWidget {
             leading: Icon(Icons.arrow_back),
             title: Text('Desconectar',
             style: GoogleFonts.akatab(),),
-            onTap: () {
-              Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const EuroProLoginScreen(),
-                      ),
-                    );
+            onTap: () async {
+              await Supabase.instance.client.auth.signOut();
+
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => EuroProLoginScreen()),
+              (route) => false,
+            );
             },
           ),
         ],
