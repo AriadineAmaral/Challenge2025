@@ -1,8 +1,7 @@
-import 'package:europro/notification_screens/notification_screen.dart';
-import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/projects_screens/project_clic_sreen.dart';
 import 'package:europro/projects_screens/project_kaizen_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
+import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -219,61 +218,7 @@ class Projects extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: Color(0xFF00358E),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Botão Notificações
-            _buildSimpleNavIcon(
-              icon: Icons.notifications_none,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NotificationScreen(),
-                    ),
-                  ),
-            ),
-
-            // Botão Home
-            _buildSimpleNavIcon(
-              icon: Icons.home_outlined,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RankingScreen()),
-                  ),
-            ),
-
-            // Botão Perfil
-            _buildSimpleNavIcon(
-              icon: Icons.person_outline,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PerfilScreen()),
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  Widget _buildSimpleNavIcon({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return IconButton(
-      icon: Icon(icon, color: Colors.white),
-      iconSize: 25, // Tamanho fixo (ajuste conforme necessário)
-      padding: EdgeInsets.symmetric(
-        horizontal: 25,
-        vertical: 10,
-      ), // Espaçamento interno
-      constraints: BoxConstraints(), // Remove restrições de tamanho padrão
-      onPressed: onPressed,
+      bottomNavigationBar: Footer(),
     );
   }
 }

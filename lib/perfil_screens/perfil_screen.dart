@@ -1,27 +1,27 @@
+import 'dart:io' show File;
+import 'dart:io';
 import 'package:europro/data/repository/controller/perfil_screen_controller.dart';
+import 'package:europro/data/repository/remote_colaborador_repository.dart';
 import 'package:europro/data/repository/remote_perfil_repository.dart';
 import 'package:europro/data/repository/remote_usuario_repository.dart';
 import 'package:europro/domain/models/Perfil.dart';
-import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/rewards_and_missions_screens/rewards_screen.dart';
+import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:europro/data/repository/remote_colaborador_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:io' show File;
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:typed_data';
+
 
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
 
   @override
-  _PerfilScreenState createState() => _PerfilScreenState();
+  State<PerfilScreen> createState() => _PerfilScreenState();
 }
 
 class _PerfilScreenState extends State<PerfilScreen> {
@@ -215,47 +215,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
           ],
         ),
       ),
-
-      bottomNavigationBar: Container(
-        height: 50,
-        color: Color(0xFF00358E),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Botão Notificações
-            _buildSimpleNavIcon(
-              icon: Icons.notifications_none,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NotificationScreen(),
-                    ),
-                  ),
-            ),
-
-            // Botão Home
-            _buildSimpleNavIcon(
-              icon: Icons.home_outlined,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RankingScreen()),
-                  ),
-            ),
-
-            // Botão Perfil
-            _buildSimpleNavIcon(
-              icon: Icons.person_outline,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PerfilScreen()),
-                  ),
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: Footer(),
     );
   }
 
@@ -561,7 +521,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
         publicUrl = await colaboradorRepo.uploadFotoPerfil(bytes);
       } else {
         // Mobile: cria um File e passa para upload
-        final file = File(pickedFile.path!);
+        final file = File(pickedFile.path);
         publicUrl = await colaboradorRepo.uploadFotoPerfil(file);
       }
 

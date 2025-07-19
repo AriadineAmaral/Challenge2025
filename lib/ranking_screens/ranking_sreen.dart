@@ -2,12 +2,11 @@ import 'package:europro/data/repository/remote_colaborador_repository.dart';
 import 'package:europro/data/repository/remote_missao_repository.dart';
 import 'package:europro/domain/models/colaborador.dart';
 import 'package:europro/mission_screens/missions_screen.dart';
-import 'package:europro/notification_screens/notification_screen.dart';
-import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/widgets/button.dart';
+import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/projects.dart';
-import 'package:flutter/material.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -92,9 +91,8 @@ class _RankingScreenState extends State<RankingScreen> {
 
   @override
   Widget build(BuildContext context) {
-   double progresso = (missoesDisponivel > 0)
-    ? missoesConcluidas / missoesDisponivel
-    : 0.0;
+    double progresso =
+        (missoesDisponivel > 0) ? missoesConcluidas / missoesDisponivel : 0.0;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -388,62 +386,7 @@ class _RankingScreenState extends State<RankingScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: Color(0xFF00358E),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Botão Notificações
-            _buildSimpleNavIcon(
-              icon: Icons.notifications_none,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NotificationScreen(),
-                    ),
-                  ),
-            ),
-
-            // Botão Home
-            _buildSimpleNavIcon(
-              icon: Icons.home_outlined,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RankingScreen()),
-                  ),
-            ),
-
-            // Botão Perfil
-            _buildSimpleNavIcon(
-              icon: Icons.person_outline,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PerfilScreen()),
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSimpleNavIcon({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return IconButton(
-      icon: Icon(icon, color: Colors.white),
-      iconSize: 25, // Tamanho fixo (ajuste conforme necessário)
-      padding: EdgeInsets.symmetric(
-        horizontal: 25,
-        vertical: 10,
-      ), // Espaçamento interno
-      constraints: BoxConstraints(), // Remove restrições de tamanho padrão
-      onPressed: onPressed,
+      bottomNavigationBar: Footer(),
     );
   }
 }

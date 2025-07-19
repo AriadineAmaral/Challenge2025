@@ -8,6 +8,7 @@ import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:europro/widgets/header.dart';
 
 class MissionScreen extends StatefulWidget {
   const MissionScreen({super.key});
@@ -73,7 +74,6 @@ class _MissionScreenState extends State<MissionScreen> {
     return colaboradorMissoes.any((c) => c.idMissao == idMissao);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,64 +90,41 @@ class _MissionScreenState extends State<MissionScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 16, 12, 0),
-
-            child: Container(
-              height: 70,
-              decoration: BoxDecoration(
-                color: const Color(0xFF00358E),
-                // Fundo azul
-                borderRadius: BorderRadius.circular(
-                  8,
-                ), // Bordas arredondadas (opcional)
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                    ), // Ícone branco
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()));
-                    },
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Missões do mês',
-                        style:GoogleFonts.akatab(
-                          color: Colors.white, // Texto branco
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48), // Espaço para equilibrar
-                ],
-              ),
+            child: Header(
+              titulo: 'Missões do mês',
+              destinoAoVoltar: RankingScreen(),
             ),
           ),
           Expanded(
             child: ListView.builder(
               itemCount: missoes.length,
               itemBuilder: (context, index) {
-                final isConcluida = isMissaoConcluida(colaboradorMissoes, missoes[index].idMissao);
+                final isConcluida = isMissaoConcluida(
+                  colaboradorMissoes,
+                  missoes[index].idMissao,
+                );
                 return Padding(
                   padding: const EdgeInsets.all(4),
                   child: _MissaoItem(
-  title: missoes[index].titulo,
-  points: 'Ganhe ${missoes[index].pontos} pontos',
-  buttonLabel: isConcluida ? 'concluída' : 'começar',
-  buttonColor: isConcluida ? const Color(0xFF979797) : const Color(0xFF00358E),
-  onButtonPressed: isConcluida
-      ? null 
-      : () async {
-          await missaoRepo.concluirMissao(missoes[index].idMissao, missoes[index].pontos);
-          await _findColaboradorMissoes(); 
-          if (mounted) setState(() {});
-        },
-            ),
+                    title: missoes[index].titulo,
+                    points: 'Ganhe ${missoes[index].pontos} pontos',
+                    buttonLabel: isConcluida ? 'concluída' : 'começar',
+                    buttonColor:
+                        isConcluida
+                            ? const Color(0xFF979797)
+                            : const Color(0xFF00358E),
+                    onButtonPressed:
+                        isConcluida
+                            ? null
+                            : () async {
+                              await missaoRepo.concluirMissao(
+                                missoes[index].idMissao,
+                                missoes[index].pontos,
+                              );
+                              await _findColaboradorMissoes();
+                              if (mounted) setState(() {});
+                            },
+                  ),
                 );
               },
             ),

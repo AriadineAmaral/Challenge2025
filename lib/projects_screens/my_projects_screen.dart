@@ -1,9 +1,8 @@
 import 'package:europro/data/repository/remote_projeto_repository.dart';
 import 'package:europro/domain/models/projeto.dart';
-import 'package:europro/notification_screens/notification_screen.dart';
-import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/projects_screens/detail_projects_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
+import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -119,46 +118,7 @@ class _MeusProjetosScreenState extends State<MyProjects> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: Color(0xFF00358E),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Botão Notificações
-            _buildSimpleNavIcon(
-              icon: Icons.notifications_none,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NotificationScreen(),
-                    ),
-                  ),
-            ),
-
-            // Botão Home
-            _buildSimpleNavIcon(
-              icon: Icons.home_outlined,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RankingScreen()),
-                  ),
-            ),
-
-            // Botão Perfil
-            _buildSimpleNavIcon(
-              icon: Icons.person_outline,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PerfilScreen()),
-                  ),
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: Footer(),
     );
   }
 }
