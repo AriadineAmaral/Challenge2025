@@ -5,6 +5,7 @@ import 'package:europro/data/repository/remote_projeto_repository.dart';
 import 'package:europro/domain/models/Perfil.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
 import 'package:europro/projects_screens/project_kaizen_and_clic_screen.dart';
+import 'package:europro/widgets/button.dart';
 import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:file_picker/file_picker.dart';
@@ -71,13 +72,15 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
     final temTextoDigitado = _userSearchController.text.trim().isNotEmpty;
 
     return Scaffold(
+      backgroundColor: Colors.white,
+
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 2,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
         shadowColor: Colors.black,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
@@ -87,7 +90,7 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Cabeçalho com botão voltar e título
-            Row(
+            Row(    
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
@@ -100,9 +103,9 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
                     );
                   },
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 18),
-                  child: Expanded(
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 45),
                     child: RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
@@ -341,140 +344,120 @@ class _ProjectKaizenState extends State<ProjectKaizen> {
             ),
             const SizedBox(height: 12),
 
-            // Botão Enviar
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.yellow,
-                  foregroundColor: Colors.black,
-                ),
-                onPressed: () async {
-                  final supabase = Supabase.instance.client;
-                  final projetoRepo = RemoteProjetoRepository(client: supabase);
+            Button(
+              text: 'Enviar',
+              backgroundColor: Colors.yellow,
+              textColor: Colors.black,
+              isBold: true,
+              onPressed: () async {
+                final supabase = Supabase.instance.client;
+                final projetoRepo = RemoteProjetoRepository(client: supabase);
 
-                  final titulo = _controllers.tituloController.text;
-                  final descricao = _controllers.descricaoController.text;
+                final titulo = _controllers.tituloController.text;
+                final descricao = _controllers.descricaoController.text;
 
-                  if (titulo.isEmpty || descricao.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          '⚠️ Por favor, preencha todos os campos',
-                          style: TextStyle(color: Colors.black),
-                        ),
-                        backgroundColor: Color(0xFFFFF200),
+                if (titulo.isEmpty || descricao.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        '⚠️ Por favor, preencha todos os campos',
+                        style: TextStyle(color: Colors.black),
                       ),
-                    );
-                    return;
-                  }
+                      backgroundColor: Color(0xFFFFF200),
+                    ),
+                  );
+                  return;
+                }
 
-                  try {
-                    final int idProjeto;
+                try {
+                  final int idProjeto;
 
-                    if (participantesSelecionados.isNotEmpty) {
-                      List<int> idColaboradores = [];
-                      for (
-                        var i = 0;
-                        i < participantesSelecionados.length;
-                        i++
-                      ) {
-                        idColaboradores.add(participantesSelecionados[i].id);
-                      }
-
-                       idProjeto = await projetoRepo.addProjeto(
-                        titulo,
-                        descricao,
-                        '1',
-                        idColaboradores: idColaboradores,
-                      );
-                    } else {
-                       idProjeto = await projetoRepo.addProjeto(
-                        titulo,
-                        descricao,
-                        '1',
-                      );
+                  if (participantesSelecionados.isNotEmpty) {
+                    List<int> idColaboradores = [];
+                    for (var i = 0; i < participantesSelecionados.length; i++) {
+                      idColaboradores.add(participantesSelecionados[i].id);
                     }
 
-                    for (final file in _selectedFiles) {
-                      final fileBytes = file.bytes;
-                      final fileName = sanitizeFileName(file.name);
-
-                      if (fileBytes == null) {
-                        print('Arquivo ${file.name} sem bytes, ignorando...');
-                        continue;
-                      }
-
-                      final storagePath = 'projetos/$idProjeto/$fileName';
-
-                      print('Fazendo upload do arquivo: $fileName');
-
-                      final response = await supabase.storage
-                          .from('arquivos')
-                          .uploadBinary(
-                            storagePath,
-                            fileBytes,
-                            fileOptions: const FileOptions(upsert: true),
-                          );
-
-                      print('Resposta do upload: $response');
-
-                      if (response.isEmpty) {
-                        print('Erro: resposta do upload está vazia');
-                        continue;
-                      }
-
-                      final publicUrl = supabase.storage
-                          .from('arquivos')
-                          .getPublicUrl(storagePath);
-
-                      print('URL pública do arquivo: $publicUrl');
-
-                      await supabase.from('arquivos').insert({
-                        'id_projeto': idProjeto,
-                        'nome_arquivo': fileName,
-                        'caminho': publicUrl,
-                      });
-                    }
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Inscrição finalizada com sucesso!'),
-                        backgroundColor: Colors.green,
-                      ),
+                    idProjeto = await projetoRepo.addProjeto(
+                      titulo,
+                      descricao,
+                      '1',
+                      idColaboradores: idColaboradores,
                     );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MyProjects(),
-                      ),
-                    );
-                  } catch (e) {
-                    print('Erro no upload: $e');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Erro: $e'),
-                        backgroundColor: Colors.red,
-                      ),
+                  } else {
+                    idProjeto = await projetoRepo.addProjeto(
+                      titulo,
+                      descricao,
+                      '1',
                     );
                   }
-                },
 
-                child: Text(
-                  'ENVIAR',
-                  style: GoogleFonts.akatab(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
+                  for (final file in _selectedFiles) {
+                    final fileBytes = file.bytes;
+                    final fileName = sanitizeFileName(file.name);
+
+                    if (fileBytes == null) {
+                      print('Arquivo ${file.name} sem bytes, ignorando...');
+                      continue;
+                    }
+
+                    final storagePath = 'projetos/$idProjeto/$fileName';
+
+                    print('Fazendo upload do arquivo: $fileName');
+
+                    final response = await supabase.storage
+                        .from('arquivos')
+                        .uploadBinary(
+                          storagePath,
+                          fileBytes,
+                          fileOptions: const FileOptions(upsert: true),
+                        );
+
+                    print('Resposta do upload: $response');
+
+                    if (response.isEmpty) {
+                      print('Erro: resposta do upload está vazia');
+                      continue;
+                    }
+
+                    final publicUrl = supabase.storage
+                        .from('arquivos')
+                        .getPublicUrl(storagePath);
+
+                    print('URL pública do arquivo: $publicUrl');
+
+                    await supabase.from('arquivos').insert({
+                      'id_projeto': idProjeto,
+                      'nome_arquivo': fileName,
+                      'caminho': publicUrl,
+                    });
+                  }
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Inscrição finalizada com sucesso!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MyProjects()),
+                  );
+                } catch (e) {
+                  print('Erro no upload: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
             ),
           ],
         ),
       ),
-       bottomNavigationBar: Footer(),
+      bottomNavigationBar: Footer(),
     );
   }
 

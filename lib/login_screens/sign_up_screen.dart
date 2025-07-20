@@ -21,7 +21,9 @@ class _AccessScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -37,17 +39,17 @@ class _AccessScreenState extends State<SignUpScreen> {
                 RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: GoogleFonts.akatab(
-                    fontSize: 36,
+                  style: GoogleFonts.kronaOne(
+                    fontSize: 30,
                     color: Colors.black,
                   ),
                   children: <TextSpan>[
                     TextSpan(text: 'Bem-Vindo(a)\n ao '),
                     TextSpan(
                       text: 'EuroPro',
-                      style: GoogleFonts.akatab(
+                      style: GoogleFonts.kronaOne(
                         color: Color(0xFF00358E),
-                        fontSize: 36, // Mantenha o tamanho consistente
+                        fontSize: 30, // Mantenha o tamanho consistente
                         fontWeight:
                             FontWeight.bold, // Opcional: se quiser negrito
                       ),
@@ -62,14 +64,14 @@ class _AccessScreenState extends State<SignUpScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Email',
-                        style: TextStyle(
+                       style: GoogleFonts.kufam(
                           fontSize: 16,
-                          
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 3),
                       TextField(
                         controller: _controllers.emailController,
                         decoration: InputDecoration(
@@ -86,7 +88,7 @@ class _AccessScreenState extends State<SignUpScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 10),
                 // Campo Senha
                 Align(
                   alignment: Alignment.centerLeft,
@@ -97,10 +99,10 @@ class _AccessScreenState extends State<SignUpScreen> {
                         'Senha',
                         style: GoogleFonts.kufam(
                           fontSize: 16,
-                          
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 3),
                       TextField(
                         controller: _controllers.senhaController,
                         obscureText: _esconderSenha,
@@ -132,7 +134,7 @@ class _AccessScreenState extends State<SignUpScreen> {
                   ),
                 ),
           
-                const SizedBox(height: 5),
+                const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Column(
@@ -142,10 +144,10 @@ class _AccessScreenState extends State<SignUpScreen> {
                         'Confirme a senha',
                         style: GoogleFonts.kufam(
                           fontSize: 16,
-                          
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 3),
                       TextField(
                         controller: _controllers.confirmarSenhaController,
                         obscureText: _esconderSenha,
@@ -176,7 +178,7 @@ class _AccessScreenState extends State<SignUpScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Column(
@@ -186,10 +188,10 @@ class _AccessScreenState extends State<SignUpScreen> {
                         'CPF',
                         style: GoogleFonts.kufam(
                           fontSize: 16,
-                         
+                         fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 3),
                       TextField(
                         controller: _controllers.cpfController,
                         obscureText: false,

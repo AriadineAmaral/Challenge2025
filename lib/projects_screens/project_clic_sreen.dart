@@ -3,6 +3,7 @@ import 'package:europro/data/repository/controller/project_kaizen_clic_controlle
 import 'package:europro/data/repository/remote_projeto_repository.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
 import 'package:europro/projects_screens/project_kaizen_and_clic_screen.dart';
+import 'package:europro/widgets/button.dart';
 import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:file_picker/file_picker.dart';
@@ -26,13 +27,15 @@ class _ProjectClicState extends State<ProjectClic> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+     backgroundColor: Colors.white,
+      
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 2,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
         shadowColor: Colors.black,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
@@ -55,34 +58,34 @@ class _ProjectClicState extends State<ProjectClic> {
                     );
                   },
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 18),
-                  child: Expanded(
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Projeto ',
-                            style: GoogleFonts.akatab(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                   Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 45),
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Projeto ',
+                              style: GoogleFonts.akatab(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text: 'Clic',
-                            style: GoogleFonts.akatab(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF00358E),
+                            TextSpan(
+                              text: 'Clic',
+                              style: GoogleFonts.akatab(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF00358E),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -180,15 +183,12 @@ class _ProjectClicState extends State<ProjectClic> {
             ),
             const SizedBox(height: 12),
 
-            // Botão Enviar
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.yellow,
-                  foregroundColor: Colors.black,
-                ),
+            Button(
+              text: 'Enviar',
+              backgroundColor: Colors.yellow,
+              textColor: Colors.black,
+              isBold: true,
+              
                 onPressed: () async {
                   final supabase = Supabase.instance.client;
                   final projetoRepo = RemoteProjetoRepository(client: supabase);
@@ -280,14 +280,6 @@ class _ProjectClicState extends State<ProjectClic> {
                     );
                   }
                 },
-                child: Text(
-                  'ENVIAR',
-                  style: GoogleFonts.akatab(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
             ),
           ],
         ),

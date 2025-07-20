@@ -5,7 +5,8 @@ class Header extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final IconData backIcon;
-  final Widget? destinoAoVoltar; // 🧭 Tela de destino ao clicar
+  final Widget? destinoAoVoltar;
+  final double height; 
 
   const Header({
     super.key,
@@ -13,16 +14,17 @@ class Header extends StatelessWidget {
     this.backgroundColor = const Color(0xFF00358E),
     this.textColor = Colors.white,
     this.backIcon = Icons.arrow_back_ios,
-    this.destinoAoVoltar, // <- Novo parâmetro
+    this.destinoAoVoltar,
+    this.height = 70, 
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70,
+      height: height, 
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: Row(
         children: [

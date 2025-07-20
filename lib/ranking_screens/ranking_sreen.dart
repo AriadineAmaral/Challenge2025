@@ -94,15 +94,18 @@ class _RankingScreenState extends State<RankingScreen> {
     double progresso =
         (missoesDisponivel > 0) ? missoesConcluidas / missoesDisponivel : 0.0;
     return Scaffold(
+      backgroundColor: Colors.white,
+      
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 2,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
         shadowColor: Colors.black,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
+      
       drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
         child: Padding(
@@ -114,14 +117,14 @@ class _RankingScreenState extends State<RankingScreen> {
                 child: Text(
                   "Colaboradores em destaque",
                   style: GoogleFonts.akatab(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               SizedBox(height: 16),
               // Cabeçalho responsivo
-              Divider(thickness: 2),
+              //Divider(thickness: 2),
               // Lista de colaboradores
               // Lista de colaboradores com rolagem própria
               Column(
@@ -140,7 +143,8 @@ class _RankingScreenState extends State<RankingScreen> {
                           child: Text(
                             'Colaborador',
                             style: GoogleFonts.akatab(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
                             ),
                           ),
                         ),
@@ -150,7 +154,8 @@ class _RankingScreenState extends State<RankingScreen> {
                             child: Text(
                               'Pontuação',
                               style: GoogleFonts.akatab(
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 18,
                               ),
                             ),
                           ),
@@ -225,14 +230,14 @@ class _RankingScreenState extends State<RankingScreen> {
                   ),
                 ],
               ),
-
+              Divider(thickness: 1),
               SizedBox(height: 24),
               // Missões do mês
               Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Color(0xFF00358E),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey,
@@ -253,7 +258,7 @@ class _RankingScreenState extends State<RankingScreen> {
                             "Missões do mês",
                             style: GoogleFonts.akatab(
                               color: Colors.white,
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -281,7 +286,7 @@ class _RankingScreenState extends State<RankingScreen> {
                               SizedBox(width: 4),
                               Icon(
                                 Icons.arrow_forward_ios,
-                                size: 16,
+                                size: 14,
                                 color: Colors.white,
                               ),
                             ],
@@ -300,7 +305,7 @@ class _RankingScreenState extends State<RankingScreen> {
                     SizedBox(height: 8),
                     Text(
                       "Concluídas $missoesConcluidas/$missoesDisponivel",
-                      style: GoogleFonts.akatab(color: Colors.white),
+                      style: GoogleFonts.akatab(color: Colors.white, fontSize: 16,), 
                     ),
                   ],
                 ),
@@ -313,8 +318,8 @@ class _RankingScreenState extends State<RankingScreen> {
                 child: Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    color: Color(0xFFF8F9FA),
+                    borderRadius: BorderRadius.circular(5),
                     boxShadow: [
                       BoxShadow(
                         color: Color(0xFF9E9E9E),
@@ -338,11 +343,13 @@ class _RankingScreenState extends State<RankingScreen> {
                               text: "#INOVAEURO",
                               style: GoogleFonts.akatab(
                                 color: Color(0xFF00358E),
+                                fontWeight: FontWeight.w900,
                               ),
                             ),
                             TextSpan(
                               text: " Transforme ideias em recompensas!",
                               style: GoogleFonts.akatab(color: Colors.black),
+
                             ),
                           ],
                         ),
@@ -369,6 +376,7 @@ class _RankingScreenState extends State<RankingScreen> {
                         text: 'Conheça nossos projetos',
                         backgroundColor: Colors.yellow,
                         textColor: Colors.black,
+                        isBold: true,
                         onPressed: () {
                           Navigator.push(
                             context,

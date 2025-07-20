@@ -18,7 +18,7 @@ class Button extends StatelessWidget {
     required this.onPressed,
     this.isBold = false,
     this.textStyle,
-    this.borderRadius = 10.0,
+    this.borderRadius = 5.0,
   });
 
   @override

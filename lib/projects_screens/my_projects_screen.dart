@@ -3,6 +3,7 @@ import 'package:europro/domain/models/projeto.dart';
 import 'package:europro/projects_screens/detail_projects_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/footer.dart';
+import 'package:europro/widgets/header.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,14 +51,16 @@ class _MeusProjetosScreenState extends State<MyProjects> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+    backgroundColor: Colors.white,
+      
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 2,
-        shadowColor: Colors.black,
-        scrolledUnderElevation: 0,
-        title: Image.asset('images/logoEuroPro.png', height: 30),
         centerTitle: true,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
+        shadowColor: Colors.black,
+        scrolledUnderElevation: 2,
+        title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
@@ -65,32 +68,16 @@ class _MeusProjetosScreenState extends State<MyProjects> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Cabeçalho com botão voltar e título
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => RankingScreen()),);
-                  },
-                  padding: EdgeInsets.only(right: 6),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 22),
-                    child: Text(
-                      'Meus projetos',
-                      style: GoogleFonts.akatab(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+            child: Header(
+              titulo: 'Meus projetos',
+              destinoAoVoltar: RankingScreen(),
+              backgroundColor: Colors.transparent,
+              textColor: Colors.black,
+              height: 30,
             ),
+          ),
             const SizedBox(height: 24),
 
             // Lista de projetos + a classe com os dados!!!

@@ -16,7 +16,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
 
@@ -92,12 +91,15 @@ class _PerfilScreenState extends State<PerfilScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+
       appBar: AppBar(
         centerTitle: true,
-        elevation: 2,
-        shadowColor: Colors.black,
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
+        shadowColor: Colors.black,
+        scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
@@ -125,7 +127,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
             SizedBox(height: 10),
             CircleAvatar(
-              radius: 50,
+              radius: 80,
               backgroundColor: Colors.grey[300],
               backgroundImage:
                   _fotoUrl != null ? NetworkImage(_fotoUrl!) : null,
@@ -161,16 +163,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
               style: GoogleFonts.kufam(color: Colors.black),
             ),
             SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            SizedBox(
+              width:
+                  MediaQuery.of(context).size.width *
+                  0.7, //  70% da largura da tela
               child: GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio:
-                    1.2, // Deixa o botão mais "baixinho" (aumente para 1.3 ou mais se quiser mais largo)
+                childAspectRatio: 1.2,
                 children: [
                   _buildProfileButton(
                     Icons.email_outlined,
@@ -178,6 +181,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     () {
                       _showAlterarEmailDialog(context);
                     },
+                    context,
                   ),
                   _buildProfileButton(
                     Icons.lock_reset_outlined,
@@ -185,6 +189,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     () {
                       _showRedefinirSenhaDialog(context);
                     },
+                    context,
                   ),
                   _buildProfileButton(
                     Icons.emoji_events_outlined,
@@ -197,6 +202,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                         ),
                       );
                     },
+                    context,
                   ),
                   _buildProfileButton(
                     Icons.assignment_outlined,
@@ -207,6 +213,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                         MaterialPageRoute(builder: (context) => MyProjects()),
                       );
                     },
+                    context,
                   ),
                 ],
               ),
@@ -216,6 +223,43 @@ class _PerfilScreenState extends State<PerfilScreen> {
         ),
       ),
       bottomNavigationBar: Footer(),
+    );
+  }
+
+  Widget _buildProfileButton(
+    IconData icon,
+    String text,
+    VoidCallback onTap,
+    BuildContext context,
+  ) {
+    final larguraTela = MediaQuery.of(context).size.width;
+
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF00358E),
+        padding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      onPressed: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: Colors.white,
+            size: larguraTela * 0.09, // Ícone com 8% da largura da tela
+          ),
+          const SizedBox(height: 4),
+          Text(
+            text,
+            style: GoogleFonts.kufam(
+              color: Colors.white,
+              fontSize: larguraTela * 0.03, // Texto com 3% da largura da tela
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -232,35 +276,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
       ), // Espaçamento interno
       constraints: BoxConstraints(), // Remove restrições de tamanho padrão
       onPressed: onPressed,
-    );
-  }
-
-  Widget _buildProfileButton(IconData icon, String text, VoidCallback onTap) {
-    return SizedBox(
-      width: 80, // Largura menor
-      height: 80, // Altura menor
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF00358E),
-          padding: EdgeInsets.all(4),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        onPressed: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 24),
-            SizedBox(height: 4),
-            Text(
-              text,
-              style: GoogleFonts.kufam(color: Colors.white, fontSize: 11),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
     );
   }
 

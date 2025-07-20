@@ -2,6 +2,7 @@ import 'package:europro/data/repository/remote_projeto_repository.dart';
 import 'package:europro/domain/models/projeto.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
 import 'package:europro/widgets/footer.dart';
+import 'package:europro/widgets/header.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,48 +23,47 @@ class _MyProjectsState extends State<DetailProjects> {
   final projetoRepo = RemoteProjetoRepository(client: Supabase.instance.client);
 
   @override
-void initState() {
-  super.initState();
-  carregarArquivos(); // Aqui você carrega os arquivos ao abrir a tela
-}
-
+  void initState() {
+    super.initState();
+    carregarArquivos(); // Aqui você carrega os arquivos ao abrir a tela
+  }
 
   String _formataData(DateTime data) {
     return DateFormat('dd/MM/yyyy').format(data);
   }
 
   Future<void> carregarArquivos() async {
-  try {
-    final resultado = await projetoRepo.buscarArquivosDoProjeto(widget.projeto.idProjeto);
-    setState(() {
-      arquivos = resultado;
-    });
-  } catch (e) {
-    print('Erro ao carregar arquivos: $e');
+    try {
+      final resultado = await projetoRepo.buscarArquivosDoProjeto(
+        widget.projeto.idProjeto,
+      );
+      setState(() {
+        arquivos = resultado;
+      });
+    } catch (e) {
+      print('Erro ao carregar arquivos: $e');
+    }
   }
-}
-
-
-
 
   List<Projeto> projetos = [];
   bool isLoading = true;
 
   List<Map<String, dynamic>> arquivos = [];
 
-
   @override
   Widget build(BuildContext context) {
     final projeto = widget.projeto;
     return Scaffold(
+      backgroundColor: Colors.white,
+
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 2,
-        shadowColor: Colors.black,
-        scrolledUnderElevation: 0,
-        title: Image.asset('images/logoEuroPro.png', height: 30),
         centerTitle: true,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
+        shadowColor: Colors.black,
+        scrolledUnderElevation: 2,
+        title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
       body: SingleChildScrollView(
@@ -71,34 +71,19 @@ void initState() {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () => {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => MyProjects()))
-                  },
-                  padding: EdgeInsets.only(left: 14),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 32),
-                    child: Text(
-                      'Meus projetos',
-                      style: GoogleFonts.akatab(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+              child: Header(
+                titulo: 'Meus projetos',
+                destinoAoVoltar: MyProjects(),
+                backgroundColor: Colors.transparent,
+                textColor: Colors.black,
+                height: 30,
+              ),
             ),
-             const SizedBox(height: 36),
+            const SizedBox(height: 12),
             Card(
-              color: Colors.white, // <- fundo branco
+              color: Color(0xFFF8F9FA),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -117,8 +102,8 @@ void initState() {
                             ? 'Projeto Clic'
                             : 'Projeto desconhecido',
                         style: GoogleFonts.akatab(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
                           color: Color(0xFF00358E),
                         ),
                         textAlign: TextAlign.center,
@@ -129,18 +114,21 @@ void initState() {
                     Text(
                       'Título:',
                       style: GoogleFonts.akatab(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(projeto.titulo, style: GoogleFonts.kufam(fontSize: 16)),
+                    Text(
+                      projeto.titulo,
+                      style: GoogleFonts.kufam(fontSize: 16),
+                    ),
                     const SizedBox(height: 24),
 
                     Text(
                       'Descrição:',
                       style: GoogleFonts.akatab(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -166,52 +154,57 @@ void initState() {
                 textAlign: TextAlign.center,
               ),
             ),
-          const SizedBox(height: 24),
-Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-  child: Text(
-    'Arquivos anexados:',
-    style: GoogleFonts.akatab(fontSize: 16, fontWeight: FontWeight.bold),
-  ),
-),
-const SizedBox(height: 8),
-...arquivos.map((arquivo) {
-  final nomeArquivo = arquivo['nome_arquivo'];
-  final caminho = arquivo['caminho'];
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Arquivos anexados:',
+                style: GoogleFonts.akatab(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...arquivos.map((arquivo) {
+              final nomeArquivo = arquivo['nome_arquivo'];
+              final caminho = arquivo['caminho'];
 
-  return Card(
-    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-    child: ListTile(
-      leading: const Icon(Icons.insert_drive_file),
-      title: Text(nomeArquivo),
-      subtitle: Text(caminho),
-      trailing: Wrap(
-        spacing: 12,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.open_in_new),
-            onPressed: () async {
-              final uri = Uri.parse(caminho);
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Não foi possível abrir o arquivo')),
-                );
-              }
-            },
-          ),
-        ],
-      ),
-    ),
-  );
-}).toList(),
-
-
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: ListTile(
+                  leading: const Icon(Icons.insert_drive_file),
+                  title: Text(nomeArquivo),
+                  subtitle: Text(caminho),
+                  trailing: Wrap(
+                    spacing: 12,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.open_in_new),
+                        onPressed: () async {
+                          final uri = Uri.parse(caminho);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Não foi possível abrir o arquivo',
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
           ],
         ),
       ),
-       bottomNavigationBar: Footer(),
+      bottomNavigationBar: Footer(),
     );
   }
 }

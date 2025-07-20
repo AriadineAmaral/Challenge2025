@@ -19,7 +19,9 @@ class _AccessScreenState extends State<AccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -34,17 +36,17 @@ class _AccessScreenState extends State<AccessScreen> {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: GoogleFonts.akatab(
-                    fontSize: 36,
+                  style: GoogleFonts.kronaOne(
+                    fontSize: 30,
                     color: Colors.black,
                   ),
                   children: <TextSpan>[
                     TextSpan(text: 'Bem-Vindo(a)\n ao '),
                     TextSpan(
                       text: 'EuroPro',
-                      style: GoogleFonts.akatab(
+                      style: GoogleFonts.kronaOne(
                         color: Color(0xFF00358E),
-                        fontSize: 36, // Mantenha o tamanho consistente
+                        fontSize: 30, // Mantenha o tamanho consistente
                         fontWeight:
                             FontWeight.bold, // Opcional: se quiser negrito
                       ),

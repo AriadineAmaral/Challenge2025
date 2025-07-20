@@ -1,14 +1,15 @@
 import 'package:europro/data/repository/remote_missao_repository.dart';
 import 'package:europro/domain/models/colaborador_missao.dart';
 import 'package:europro/domain/models/missao.dart';
-import 'package:europro/notification_screens/notification_screen.dart';
-import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
+import 'package:europro/rewards_and_missions_screens/rewards_screen.dart';
+import 'package:europro/widgets/button.dart';
+import 'package:europro/widgets/footer.dart';
+import 'package:europro/widgets/header.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:europro/widgets/header.dart';
 
 class MissionScreen extends StatefulWidget {
   const MissionScreen({super.key});
@@ -77,122 +78,86 @@ class _MissionScreenState extends State<MissionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 2,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
         shadowColor: Colors.black,
-        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 16, 12, 0),
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
             child: Header(
               titulo: 'Missões do mês',
               destinoAoVoltar: RankingScreen(),
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: missoes.length,
-              itemBuilder: (context, index) {
-                final isConcluida = isMissaoConcluida(
-                  colaboradorMissoes,
-                  missoes[index].idMissao,
-                );
-                return Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: _MissaoItem(
-                    title: missoes[index].titulo,
-                    points: 'Ganhe ${missoes[index].pontos} pontos',
-                    buttonLabel: isConcluida ? 'concluída' : 'começar',
-                    buttonColor:
-                        isConcluida
-                            ? const Color(0xFF979797)
-                            : const Color(0xFF00358E),
-                    onButtonPressed:
-                        isConcluida
-                            ? null
-                            : () async {
-                              await missaoRepo.concluirMissao(
-                                missoes[index].idMissao,
-                                missoes[index].pontos,
-                              );
-                              await _findColaboradorMissoes();
-                              if (mounted) setState(() {});
-                            },
+            child: Padding(
+               padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+              child: ListView.builder(
+                itemCount: missoes.length,
+                itemBuilder: (context, index) {
+                  final isConcluida = isMissaoConcluida(
+                    colaboradorMissoes,
+                    missoes[index].idMissao,
+                  );
+                  return Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: _MissaoItem(
+                      title: missoes[index].titulo,
+                      points: 'Ganhe ${missoes[index].pontos} pontos',
+                      buttonLabel: isConcluida ? 'concluída' : 'começar',
+                      buttonColor:
+                          isConcluida
+                              ? const Color(0xFF979797)
+                              : const Color(0xFF00358E),
+                      onButtonPressed:
+                          isConcluida
+                              ? null
+                              : () async {
+                                await missaoRepo.concluirMissao(
+                                  missoes[index].idMissao,
+                                  missoes[index].pontos,
+                                );
+                                await _findColaboradorMissoes();
+                                if (mounted) setState(() {});
+                              },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Button(
+              text: 'Ver minha pontuação',
+              backgroundColor: Colors.yellow,
+              textColor: Colors.black,
+              isBold: true,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RewardsScreen(),
                   ),
                 );
               },
             ),
           ),
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.yellow,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              child: Text(
-                'ver minha pontuação',
-                style: GoogleFonts.akatab(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
         ],
       ),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: Color(0xFF00358E),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Botão Notificações
-            _buildSimpleNavIcon(
-              icon: Icons.notifications_none,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NotificationScreen(),
-                    ),
-                  ),
-            ),
-
-            // Botão Home
-            _buildSimpleNavIcon(
-              icon: Icons.home_outlined,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RankingScreen()),
-                  ),
-            ),
-
-            // Botão Perfil
-            _buildSimpleNavIcon(
-              icon: Icons.person_outline,
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PerfilScreen()),
-                  ),
-            ),
-          ],
-        ),
-      ),
+       bottomNavigationBar: Footer(),
     );
   }
 }

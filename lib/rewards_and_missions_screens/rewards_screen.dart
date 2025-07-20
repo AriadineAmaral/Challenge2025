@@ -2,6 +2,7 @@ import 'package:europro/data/repository/remote_pontuacao_repository.dart';
 import 'package:europro/domain/models/pontuacao.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/footer.dart';
+import 'package:europro/widgets/header.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -110,56 +111,43 @@ class _RewardsScreenState extends State<RewardsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // ArrowBack + Título
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RankingScreen()),
-                    );
-                  },
-                ),
-                Expanded(
-                  child: Text(
-                    'Minha pontuação',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.akatab(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 48,
-                ), // Para compensar o espaço do ícone de voltar
-              ],
+             Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+            child: Header(
+              titulo: 'Minha pontuação',
+              destinoAoVoltar: RankingScreen(),
+              backgroundColor: Colors.transparent,
+              textColor: Colors.black,
+              height: 30,
             ),
+          ),
 
             const SizedBox(height: 16),
 
             // Pontuação total
             Container(
+              alignment: Alignment.center,
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
                 color: const Color(0xFF00358E),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(5),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.emoji_events, color: Colors.white, size: 28),
+                  Icon(Icons.emoji_events, color: Colors.white, size: 50),
                   SizedBox(width: 12),
-                  Text(
-                    '$pontuacao',
-                    style: GoogleFonts.kufam(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      '$pontuacao',
+                      style: GoogleFonts.kufam(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -172,8 +160,8 @@ class _RewardsScreenState extends State<RewardsScreen> {
             Text(
               "Histórico de pontuação",
               style: GoogleFonts.akatab(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
                 color: Colors.black,
               ),
             ),
@@ -186,7 +174,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(5),
                   boxShadow: [
                     BoxShadow(
                       color: Color(0xFF9E9E9E),
@@ -217,7 +205,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                                       isNegative
                                           ? Colors.red
                                           : const Color(0xFF007BFF),
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                 ),
                                 textAlign: TextAlign.center,
                               ),

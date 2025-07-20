@@ -49,6 +49,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Text(
@@ -56,7 +57,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             style: GoogleFonts.akatab(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 24,
             ),
           ),
         ),
