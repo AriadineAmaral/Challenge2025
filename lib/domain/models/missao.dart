@@ -4,6 +4,7 @@ class Missao {
   final int pontos;
   final bool disponivel;
   final DateTime dataVencimento;
+  final String? link;
 
 
   Missao({
@@ -12,6 +13,7 @@ class Missao {
     required this.pontos,
     required this.disponivel,
     required this.dataVencimento,
+     this.link,
   });
 
   factory Missao.fromMap(Map<String, dynamic> map) {
@@ -21,6 +23,7 @@ class Missao {
       pontos: map['pontos'],
       disponivel: map['disponivel'],
       dataVencimento: DateTime.parse(map['data_vencimento'] as String),
+      link: map['link'],
     );
   }
 

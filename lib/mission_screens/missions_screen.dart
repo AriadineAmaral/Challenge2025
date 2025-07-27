@@ -10,6 +10,8 @@ import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class MissionScreen extends StatefulWidget {
   const MissionScreen({super.key});
@@ -119,17 +121,31 @@ class _MissionScreenState extends State<MissionScreen> {
                           isConcluida
                               ? const Color(0xFF979797)
                               : const Color(0xFF00358E),
-                      onButtonPressed:
-                          isConcluida
-                              ? null
-                              : () async {
-                                await missaoRepo.concluirMissao(
-                                  missoes[index].idMissao,
-                                  missoes[index].pontos,
+                    onButtonPressed: isConcluida
+                       ? null
+                        : () async {
+                            final missao = missoes[index];
+
+                            // Se a missão tiver um link, abra o link
+                            if (missao.link != null && missao.link!.isNotEmpty) {
+                              final uri = Uri.parse(missao.link!);
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri, mode: LaunchMode.externalApplication);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Não foi possível abrir o link')),
                                 );
-                                await _findColaboradorMissoes();
-                                if (mounted) setState(() {});
-                              },
+                              }
+                            }
+
+                            // Depois marca a missão como concluída normalmente
+                            await missaoRepo.concluirMissao(
+                              missao.idMissao,
+                              missao.pontos,
+                            );
+                            await _findColaboradorMissoes();
+                            if (mounted) setState(() {});
+                          }, 
                     ),
                   );
                 },
