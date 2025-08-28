@@ -10,13 +10,6 @@ void main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlreGxmYXJ2bW9raXdqZnFxaWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkxNzAxOTUsImV4cCI6MjA2NDc0NjE5NX0.0b4EJzlHDDTD3m9pjYAVcjLNoOqjWWQJVw2WWBUb8dg',
   );
 
-  // print(
-  //   'URL do Supabase carregada: ${const String.fromEnvironment('SUPABASE_URL')}',
-  // );
-  // print(
-  //   'Chave do Supabase carregada: ${const String.fromEnvironment('SUPABASE_KEY')}',
-  // );
-
   runApp(const EuroProApp());
 }
 

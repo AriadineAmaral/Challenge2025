@@ -17,11 +17,7 @@ class MyProjects extends StatefulWidget {
 }
 
 class _MeusProjetosScreenState extends State<MyProjects> {
-
-
-  final projetoRepo = RemoteProjetoRepository(
-   client: Supabase.instance.client,
-  );
+  final projetoRepo = RemoteProjetoRepository(client: Supabase.instance.client);
 
   List<Projeto> projetos = [];
   bool isLoading = true;
@@ -29,30 +25,35 @@ class _MeusProjetosScreenState extends State<MyProjects> {
   @override
   void initState() {
     super.initState();
-    _findProjetos();
+    // _findProjetos();
+    _loadAllData();
   }
 
-  Future<void> _findProjetos() async {
-
+  Future<void> _loadAllData() async {
+    setState(() => isLoading = true);
     try {
-      final resultado = await projetoRepo.listProjetosColaborador();
-      setState(() {
-        projetos = resultado;
-        isLoading = false;
-      });
+      await Future.wait([_findProjetos()]);
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      // Trate erros se quiser
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
+  Future<void> _findProjetos() async {
+    try {
+      final resultado = await projetoRepo.listProjetosColaborador();
+      projetos = resultado;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    backgroundColor: Colors.white,
-      
+      backgroundColor: Colors.white,
+
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -63,47 +64,59 @@ class _MeusProjetosScreenState extends State<MyProjects> {
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-            child: Header(
-              titulo: 'Meus projetos',
-              destinoAoVoltar: RankingScreen(),
-              backgroundColor: Colors.transparent,
-              textColor: Colors.black,
-              height: 30,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                  child: Header(
+                    titulo: 'Meus projetos',
+                    destinoAoVoltar: RankingScreen(),
+                    backgroundColor: Colors.transparent,
+                    textColor: Colors.black,
+                    height: 30,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Lista de projetos + a classe com os dados!!!
+                ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: projetos.length,
+                  separatorBuilder:
+                      (context, index) => const Divider(height: 24),
+                  itemBuilder: (context, index) {
+                    final projeto = projetos[index];
+                    return _ProjetoCard(
+                      projeto: projeto,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => DetailProjects(projeto: projeto),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
           ),
-            const SizedBox(height: 24),
-
-            // Lista de projetos + a classe com os dados!!!
-            ListView.separated(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: projetos.length,
-              separatorBuilder: (context, index) => const Divider(height: 24),
-              itemBuilder: (context, index) {
-                final projeto = projetos[index];
-                return _ProjetoCard(
-                  projeto: projeto,
-                  onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailProjects(projeto: projeto),
-                    ),
-                  );
-                }
-
-                );
-              },
+          if (isLoading)
+            Container(
+              color: const Color.fromRGBO(255, 255, 255, 0.7),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00358E)),
+              ),
             ),
-          ],
-        ),
+        ],
       ),
       bottomNavigationBar: Footer(),
     );
@@ -161,9 +174,9 @@ class _ProjetoCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                   projeto.tipoProjeto == 1
-                  ? 'Projeto Kaizen'
-                  : projeto.tipoProjeto == 2
+                  projeto.tipoProjeto == 1
+                      ? 'Projeto Kaizen'
+                      : projeto.tipoProjeto == 2
                       ? 'Projeto Clic'
                       : 'Projeto desconhecido',
                   style: GoogleFonts.akatab(
@@ -178,7 +191,11 @@ class _ProjetoCard extends StatelessWidget {
             const SizedBox(height: 8),
             // Status
             Text(
-              'Status: ${_capitalize(projeto.idStatus == 1 ? 'análise e seleção' : projeto.idStatus == 2 ? 'em desenvolvimento' : 'finalizado')}',
+              'Status: ${_capitalize(projeto.idStatus == 1
+                  ? 'análise e seleção'
+                  : projeto.idStatus == 2
+                  ? 'em desenvolvimento'
+                  : 'finalizado')}',
               style: GoogleFonts.kufam(fontSize: 14),
             ),
           ],

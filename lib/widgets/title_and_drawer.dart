@@ -153,22 +153,22 @@ class _TitleAndDrawerState extends State<TitleAndDrawer> {
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0),
-                  child: ListTile(
-                    leading: Icon(Icons.settings),
-                    title: Text(
-                      'Alterar dados cadastrais',
-                      style: GoogleFonts.akatab(),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PerfilScreen()),
-                      );
-                    },
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(vertical: 2.0),
+                //   child: ListTile(
+                //     leading: Icon(Icons.settings),
+                //     title: Text(
+                //       'Alterar dados cadastrais',
+                //       style: GoogleFonts.akatab(),
+                //     ),
+                //     onTap: () {
+                //       Navigator.push(
+                //         context,
+                //         MaterialPageRoute(builder: (context) => PerfilScreen()),
+                //       );
+                //     },
+                //   ),
+                // ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
