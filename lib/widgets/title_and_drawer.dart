@@ -43,7 +43,7 @@ class _TitleAndDrawerState extends State<TitleAndDrawer> {
     // Agora precisamos pegar a foto, similar ao que faz no PerfilScreen
     String? fotoUrl;
 
-    if (perfil.id != null && perfil.id != '') {
+    if (perfil.id != '') {
       final colaborador = await Supabase.instance.client
           .from('colaboradores')
           .select('foto_url')

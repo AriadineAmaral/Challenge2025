@@ -92,7 +92,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -103,127 +102,142 @@ class _PerfilScreenState extends State<PerfilScreen> {
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5, left: 7, right: 16),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RankingScreen(),
+      body: LayoutBuilder(
+               builder: (context, constraints) {
+        return Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                      child: Row(
+                        children: [
+                          if(!kIsWeb)
+                          IconButton(
+                            icon: Icon(Icons.arrow_back_ios),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RankingScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          Spacer(),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: kIsWeb ? 600 : constraints.maxWidth),
+                      child: CircleAvatar(
+                        radius: 80,
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage:
+                            _fotoUrl != null ? NetworkImage(_fotoUrl!) : null,
+                        child:
+                            _fotoUrl == null
+                                ? Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.white,
+                                )
+                                : null,
+                      ),
+                    ),
+                
+                    SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () => _editarFoto(context),
+                      child: Text(
+                        'editar foto',
+                        style: GoogleFonts.kufam(
+                          color: Colors.black,
+                          fontSize: 14,
+                          decoration: TextDecoration.underline,
                         ),
-                      );
-                    },
-                  ),
-                  Spacer(),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            CircleAvatar(
-              radius: 80,
-              backgroundColor: Colors.grey[300],
-              backgroundImage:
-                  _fotoUrl != null ? NetworkImage(_fotoUrl!) : null,
-              child:
-                  _fotoUrl == null
-                      ? Icon(Icons.person, size: 50, color: Colors.white)
-                      : null,
-            ),
-
-            SizedBox(height: 8),
-            GestureDetector(
-              onTap: () => _editarFoto(context),
-              child: Text(
-                'editar foto',
-                style: GoogleFonts.kufam(
-                  color: Colors.black,
-                  fontSize: 14,
-                  decoration: TextDecoration.underline,
+                      ),
+                    ),
+                
+                    SizedBox(height: 8),
+                    Text(
+                      perfil?.nome ?? '',
+                      style: GoogleFonts.kufam(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      perfil?.email ?? '',
+                      style: GoogleFonts.kufam(color: Colors.black),
+                    ),
+                    SizedBox(height: 24),
+                    SizedBox(
+                      width:
+                          300, 
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 1.2,
+                        children: [
+                          _buildProfileButton(
+                            Icons.email_outlined,
+                            'alterar\nemail',
+                            () {
+                              _showAlterarEmailDialog(context);
+                            },
+                            context,
+                          ),
+                          _buildProfileButton(
+                            Icons.lock_reset_outlined,
+                            'redefinir\nsenha',
+                            () {
+                              _showRedefinirSenhaDialog(context);
+                            },
+                            context,
+                          ),
+                          _buildProfileButton(
+                            Icons.emoji_events_outlined,
+                            'minha\npontuação',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RewardsScreen(),
+                                ),
+                              );
+                            },
+                            context,
+                          ),
+                          _buildProfileButton(
+                            Icons.assignment_outlined,
+                            'meus\nprojetos',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MyProjects(),
+                                ),
+                              );
+                            },
+                            context,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                  ],
                 ),
               ),
-            ),
-
-            SizedBox(height: 8),
-            Text(
-              perfil?.nome ?? '',
-              style: GoogleFonts.kufam(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              perfil?.email ?? '',
-              style: GoogleFonts.kufam(color: Colors.black),
-            ),
-            SizedBox(height: 24),
-            SizedBox(
-              width:
-                  MediaQuery.of(context).size.width *
-                  0.7, //  70% da largura da tela
-              child: GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 1.2,
-                children: [
-                  _buildProfileButton(
-                    Icons.email_outlined,
-                    'alterar\nemail',
-                    () {
-                      _showAlterarEmailDialog(context);
-                    },
-                    context,
-                  ),
-                  _buildProfileButton(
-                    Icons.lock_reset_outlined,
-                    'redefinir\nsenha',
-                    () {
-                      _showRedefinirSenhaDialog(context);
-                    },
-                    context,
-                  ),
-                  _buildProfileButton(
-                    Icons.emoji_events_outlined,
-                    'minha\npontuação',
-                    () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RewardsScreen(),
-                        ),
-                      );
-                    },
-                    context,
-                  ),
-                  _buildProfileButton(
-                    Icons.assignment_outlined,
-                    'meus\nprojetos',
-                    () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MyProjects()),
-                      );
-                    },
-                    context,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-          ],
-        ),
+            );
+               }
       ),
-      bottomNavigationBar: Footer(),
-    );
+        bottomNavigationBar: Footer(),
+      );
   }
 
   Widget _buildProfileButton(
@@ -232,13 +246,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
     VoidCallback onTap,
     BuildContext context,
   ) {
-    final larguraTela = MediaQuery.of(context).size.width;
-
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF00358E),
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        fixedSize: const Size(80, 60), // Limita o tamanho do botão
       ),
       onPressed: onTap,
       child: Column(
@@ -247,14 +260,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
           Icon(
             icon,
             color: Colors.white,
-            size: larguraTela * 0.09, // Ícone com 8% da largura da tela
+            size: 32,
           ),
           const SizedBox(height: 4),
           Text(
             text,
             style: GoogleFonts.kufam(
               color: Colors.white,
-              fontSize: larguraTela * 0.03, // Texto com 3% da largura da tela
+              fontSize: 14,
             ),
             textAlign: TextAlign.center,
           ),
@@ -269,12 +282,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }) {
     return IconButton(
       icon: Icon(icon, color: Colors.white),
-      iconSize: 25, // Tamanho fixo (ajuste conforme necessário)
+      iconSize: 25, 
       padding: EdgeInsets.symmetric(
         horizontal: 25,
         vertical: 10,
       ), // Espaçamento interno
-      constraints: BoxConstraints(), // Remove restrições de tamanho padrão
+      constraints: BoxConstraints(),
       onPressed: onPressed,
     );
   }
@@ -348,38 +361,38 @@ class _PerfilScreenState extends State<PerfilScreen> {
                         return;
                       }
 
-                      try {
-                        final usuarioRepo = RemoteUsuarioRepository(
-                          client: Supabase.instance.client,
-                        );
+                      // try {
+                      //   final usuarioRepo = RemoteUsuarioRepository(
+                      //     client: Supabase.instance.client,
+                      //   );
 
-                        await usuarioRepo.updateEmail(novoEmail, emailAtual);
+                      //   await usuarioRepo.updateEmail(novoEmail, emailAtual);
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'email alterado com sucesso',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                            backgroundColor: Color(0xFF00923E),
-                          ),
-                        );
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        String mensagemErro = e.toString().replaceAll(
-                          'Exception: ',
-                          '',
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              mensagemErro,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     const SnackBar(
+                      //       content: Text(
+                      //         'email alterado com sucesso',
+                      //         style: TextStyle(color: Colors.black),
+                      //       ),
+                      //       backgroundColor: Color(0xFF00923E),
+                      //     ),
+                      //   );
+                      //   Navigator.of(context).pop();
+                      // } catch (e) {
+                      //   String mensagemErro = e.toString().replaceAll(
+                      //     'Exception: ',
+                      //     '',
+                      //   );
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text(
+                      //         mensagemErro,
+                      //         style: TextStyle(color: Colors.white),
+                      //       ),
+                      //       backgroundColor: Colors.red,
+                      //     ),
+                      //   );
+                      // }
                     },
                     child: Text(
                       'alterar',

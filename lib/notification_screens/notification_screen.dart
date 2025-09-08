@@ -2,6 +2,7 @@ import 'package:europro/data/repository/remote_notificacao_repository.dart';
 import 'package:europro/domain/models/notificacao.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -63,7 +64,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ),
         backgroundColor: const Color(0xFF00358E),
-        leading: IconButton(
+        automaticallyImplyLeading: false,
+        leading: kIsWeb
+            ? null
+            :
+        IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
             Navigator.push(
@@ -73,27 +78,36 @@ class _NotificationScreenState extends State<NotificationScreen> {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: ListView.builder(
-          // Usamos ListView.builder para lista dinâmica
-          itemCount: notificacoes.length,
-          itemBuilder: (context, index) {
-            return _NotificacaoItem(
-              texto: notificacoes[index].conteudo,
-              data:
-                  DateFormat(
-                    'dd/MM/yyyy',
-                  ).format(notificacoes[index].data).toString(),
-              onRemover: () async {
-                 notificaocesRepo.deleteNotificacao(
-                  notificacoes[index].idNotificacao,
-                );
-                _removerNotificacao(index);
-              },
-            );
-          },
-        ),
+      body: LayoutBuilder(
+        builder: (context, constraints){
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: kIsWeb ? 600 : constraints.maxWidth),
+              child: ListView.builder(
+                // Usamos ListView.builder para lista dinâmica
+                itemCount: notificacoes.length,
+                itemBuilder: (context, index) {
+                  return _NotificacaoItem(
+                    texto: notificacoes[index].conteudo,
+                    data:
+                        DateFormat(
+                          'dd/MM/yyyy',
+                        ).format(notificacoes[index].data).toString(),
+                    onRemover: () async {
+                       notificaocesRepo.deleteNotificacao(
+                        notificacoes[index].idNotificacao,
+                      );
+                      _removerNotificacao(index);
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+        }
       ),
       bottomNavigationBar: Container(
         height: 50,

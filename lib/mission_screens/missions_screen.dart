@@ -7,6 +7,7 @@ import 'package:europro/widgets/button.dart';
 import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/header.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -75,108 +76,117 @@ class _MissionScreenState extends State<MissionScreen> {
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
-      body: Stack(
-        children: [
-          Column(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+        return Center(
+          child: Stack(
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                child: Header(
-                  titulo: 'Missões do mês',
-                  destinoAoVoltar: RankingScreen(),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: kIsWeb ? 600 : constraints.maxWidth),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                      child: Header(
+                        titulo: 'Missões do mês',
+                        destinoAoVoltar: RankingScreen(),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                        child: ListView.builder(
+                          itemCount: missoes.length,
+                          itemBuilder: (context, index) {
+                            final isConcluida = isMissaoConcluida(
+                              colaboradorMissoes,
+                              missoes[index].idMissao,
+                            );
+                            return Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: _MissaoItem(
+                                title: missoes[index].titulo,
+                                points: 'Ganhe ${missoes[index].pontos} pontos',
+                                buttonLabel: isConcluida ? 'concluída' : 'começar',
+                                buttonColor:
+                                    isConcluida
+                                        ? const Color(0xFF979797)
+                                        : const Color(0xFF00358E),
+                                onButtonPressed:
+                                    isConcluida
+                                        ? null
+                                        : () async {
+                                          final missao = missoes[index];
+                
+                                          // Se a missão tiver um link, abra o link
+                                          if (missao.link != null &&
+                                              missao.link!.isNotEmpty) {
+                                            final uri = Uri.parse(missao.link!);
+                                            if (await canLaunchUrl(uri)) {
+                                              await launchUrl(
+                                                uri,
+                                                mode: LaunchMode.externalApplication,
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Não foi possível abrir o link',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                
+                                          // Depois marca a missão como concluída normalmente
+                                          await missaoRepo.concluirMissao(
+                                            missao.idMissao,
+                                            missao.pontos,
+                                          );
+                                          await _findColaboradorMissoes();
+                                          if (mounted) setState(() {});
+                                        },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Button(
+                        text: 'Ver minha pontuação',
+                        backgroundColor: Colors.yellow,
+                        textColor: Colors.black,
+                        isBold: true,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RewardsScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                  child: ListView.builder(
-                    itemCount: missoes.length,
-                    itemBuilder: (context, index) {
-                      final isConcluida = isMissaoConcluida(
-                        colaboradorMissoes,
-                        missoes[index].idMissao,
-                      );
-                      return Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: _MissaoItem(
-                          title: missoes[index].titulo,
-                          points: 'Ganhe ${missoes[index].pontos} pontos',
-                          buttonLabel: isConcluida ? 'concluída' : 'começar',
-                          buttonColor:
-                              isConcluida
-                                  ? const Color(0xFF979797)
-                                  : const Color(0xFF00358E),
-                          onButtonPressed:
-                              isConcluida
-                                  ? null
-                                  : () async {
-                                    final missao = missoes[index];
-
-                                    // Se a missão tiver um link, abra o link
-                                    if (missao.link != null &&
-                                        missao.link!.isNotEmpty) {
-                                      final uri = Uri.parse(missao.link!);
-                                      if (await canLaunchUrl(uri)) {
-                                        await launchUrl(
-                                          uri,
-                                          mode: LaunchMode.externalApplication,
-                                        );
-                                      } else {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Não foi possível abrir o link',
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    }
-
-                                    // Depois marca a missão como concluída normalmente
-                                    await missaoRepo.concluirMissao(
-                                      missao.idMissao,
-                                      missao.pontos,
-                                    );
-                                    await _findColaboradorMissoes();
-                                    if (mounted) setState(() {});
-                                  },
-                        ),
-                      );
-                    },
+              if (isLoading)
+                Container(
+                  color: const Color.fromRGBO(255, 255, 255, 0.7),
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF00358E)),
                   ),
                 ),
-              ),
-
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Button(
-                  text: 'Ver minha pontuação',
-                  backgroundColor: Colors.yellow,
-                  textColor: Colors.black,
-                  isBold: true,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RewardsScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
             ],
           ),
-          if (isLoading)
-            Container(
-              color: const Color.fromRGBO(255, 255, 255, 0.7),
-              child: const Center(
-                child: CircularProgressIndicator(color: Color(0xFF00358E)),
-              ),
-            ),
-        ],
+        );
+        }
       ),
       bottomNavigationBar: Footer(),
     );
