@@ -40,7 +40,7 @@ class _TitleAndDrawerState extends State<TitleAndDrawer> {
   try {
     final perfil = await perfilRepo.perfilUsuario();
 
-    // Agora precisamos pegar a foto, similar ao que faz no PerfilScreen
+
     String? fotoUrl;
 
     if (perfil.id != '') {

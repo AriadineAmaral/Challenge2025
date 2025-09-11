@@ -41,6 +41,7 @@ class _AccessScreenState extends State<CompleteSignUpScreen> {
               constraints: BoxConstraints(maxWidth: kIsWeb ? 400 : constraints.maxWidth),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   RichText(
                     textAlign: TextAlign.center,
