@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Header extends StatelessWidget {
@@ -28,6 +29,9 @@ class Header extends StatelessWidget {
       ),
       child: Row(
         children: [
+          if(kIsWeb)
+          const SizedBox(width: 48),
+          if(!kIsWeb)
           IconButton(
             icon: Icon(backIcon, color: textColor),
             onPressed: () {

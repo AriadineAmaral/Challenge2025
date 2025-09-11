@@ -1,9 +1,9 @@
 // lib/screens/login_screen.dart
 import 'package:europro/login_screens/access_screen.dart';
 import 'package:europro/login_screens/sign_up_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../widgets/button.dart';
-
 class EuroProLoginScreen extends StatelessWidget {
   const EuroProLoginScreen({super.key});
 
@@ -11,52 +11,66 @@ class EuroProLoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('images/logoEuroPro.png', width: 250),
-              SizedBox(height: 80),
-              Button(
-                text: 'Acessar conta',
-                backgroundColor: const Color(0xFFFFF200),
-                textColor: Colors.black,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AccessScreen(),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: SizedBox(
+              height: constraints.maxHeight * 0.7,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: kIsWeb ? 400 : constraints.maxWidth),
+                child: Material(
+                  elevation: 10,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset('images/logoEuroPro.png', width: 250),
+                        const SizedBox(height: 60),
+                        Button(
+                          text: 'Acessar conta',
+                          backgroundColor: const Color(0xFFFFF200),
+                          textColor: Colors.black,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AccessScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Primeiro acesso?',
+                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Button(
+                          text: 'Criar conta',
+                          backgroundColor: const Color(0xFF00358E),
+                          textColor: Colors.white,
+                          isBold: true,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignUpScreen()),
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                  );
-                },
-              ),
-
-              SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Primeiro acesso?',
-                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
                 ),
               ),
-              SizedBox(height: 8),
-              Button(
-                text: 'Criar conta',
-                backgroundColor: const Color(0xFF00358E),
-                textColor: Colors.white,
-                isBold: true,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignUpScreen()),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        }
       ),
     );
   }
