@@ -1,4 +1,5 @@
 // title_drawer_widget.dart
+import 'package:europro/chatbot_screen/eurobot_screen.dart';
 import 'package:europro/login_screens/login_screen.dart';
 import 'package:europro/mission_screens/missions_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
@@ -242,6 +243,23 @@ class _TitleAndDrawerState extends State<TitleAndDrawer> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => RankingScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: ListTile(
+                    leading: Icon(Icons.leaderboard),
+                    title: Text(
+                      'EuroBot',
+                      style: GoogleFonts.akatab(),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(),
                         ),
                       );
                     },

@@ -1,9 +1,14 @@
 import 'package:europro/login_screens/initial_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: ".env");
+  print(dotenv.env['GEMINI_API_KEY']);
+
   await Supabase.initialize(
     url: 'https://ikxlfarvmokiwjfqqial.supabase.co',
     anonKey:

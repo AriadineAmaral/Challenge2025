@@ -15,7 +15,7 @@ class EuroProLoginScreen extends StatelessWidget {
         builder: (context, constraints) {
           return Center(
               child: Container(
-                width: 400,
+                width: 300,
                 height: 300,
                 child: Column(                
                   crossAxisAlignment: CrossAxisAlignment.center,
