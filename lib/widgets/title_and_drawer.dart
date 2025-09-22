@@ -250,7 +250,7 @@ class _TitleAndDrawerState extends State<TitleAndDrawer> {
                 ),Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
-                    leading: Icon(Icons.leaderboard),
+                    leading: Icon(Icons.chat_bubble_outline_rounded),
                     title: Text(
                       'EuroBot',
                       style: GoogleFonts.akatab(),

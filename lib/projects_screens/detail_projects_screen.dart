@@ -117,7 +117,7 @@ class _MyProjectsState extends State<DetailProjects> {
                                   projeto.tipoProjeto == 1
                                       ? 'Projeto Kaizen'
                                       : projeto.tipoProjeto == 2
-                                      ? 'Projeto Clic'
+                                      ? 'Ideia Clic'
                                       : 'Projeto desconhecido',
                                   style: GoogleFonts.akatab(
                                     fontSize: 22,
@@ -152,7 +152,7 @@ class _MyProjectsState extends State<DetailProjects> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                projeto.descricao,
+                                 projeto.descricao.replaceAll(r'\n\n', '\n\n'),
                                 style: GoogleFonts.kufam(fontSize: 16),
                               ),
                               const SizedBox(height: 8),

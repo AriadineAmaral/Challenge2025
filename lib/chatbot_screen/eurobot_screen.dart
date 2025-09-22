@@ -1,5 +1,7 @@
+import 'package:europro/widgets/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'chatbot_logic/chat_manager.dart';
@@ -24,7 +26,8 @@ class ChatScreenState extends State<ChatScreen> {
     final isUser = role == 'user';
 
     return Row(
-      mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+      mainAxisAlignment:
+          isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Flexible(
@@ -73,10 +76,12 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildSidebar() {
-    final filteredChats = _chatManager.allChats.where((chat) {
-      final content = chat.map((msg) => msg['content']).join(" ").toLowerCase();
-      return content.contains(_chatManager.searchQuery.toLowerCase());
-    }).toList();
+    final filteredChats =
+        _chatManager.allChats.where((chat) {
+          final content =
+              chat.map((msg) => msg['content']).join(" ").toLowerCase();
+          return content.contains(_chatManager.searchQuery.toLowerCase());
+        }).toList();
 
     return Container(
       width: 280,
@@ -96,7 +101,10 @@ class ChatScreenState extends State<ChatScreen> {
                 children: [
                   Icon(Icons.add, color: Color(0xFFFFD100)),
                   SizedBox(width: 6),
-                  Text("Novo Chat", style: TextStyle(fontWeight: FontWeight.w500)),
+                  Text(
+                    "Novo Chat",
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
                 ],
               ),
               onTap: _chatManager.newChat,
@@ -105,7 +113,10 @@ class ChatScreenState extends State<ChatScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: TextField(
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF0033A0)),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Color(0xFF0033A0),
+                  ),
                   hintText: "Procurar Chats...",
                   border: OutlineInputBorder(
                     borderSide: const BorderSide(
@@ -137,14 +148,22 @@ class ChatScreenState extends State<ChatScreen> {
                     if (msg['role'] == 'user') {
                       preview = msg['content']!.substring(
                         0,
-                        msg['content']!.length > 30 ? 30 : msg['content']!.length,
+                        msg['content']!.length > 30
+                            ? 30
+                            : msg['content']!.length,
                       );
                       break;
                     }
                   }
                   return ListTile(
-                    leading: const Icon(Icons.chat_bubble_outline, color: Color(0xFF0033A0)),
-                    title: Text(preview, style: const TextStyle(fontWeight: FontWeight.w500)),
+                    leading: const Icon(
+                      Icons.chat_bubble_outline,
+                      color: Color(0xFF0033A0),
+                    ),
+                    title: Text(
+                      preview,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
                     onTap: () {
                       setState(() {
                         _chatManager.messages.clear();
@@ -160,7 +179,10 @@ class ChatScreenState extends State<ChatScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text("Limpar Histórico", style: TextStyle(color: Colors.red)),
+              title: const Text(
+                "Limpar Histórico",
+                style: TextStyle(color: Colors.red),
+              ),
               onTap: _chatManager.clearHistory,
             ),
           ],
@@ -196,15 +218,15 @@ class ChatScreenState extends State<ChatScreen> {
                             height: 200,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'EuroBot',
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0033A0),
-                          ),
-                        ),
+                        // const SizedBox(width: 10),
+                        // Text(
+                        //   'EuroBot',
+                        //   style: GoogleFonts.kufam(
+                        //     fontSize: 25,
+                        //     fontWeight: FontWeight.w500,
+                        //     color: Color(0xFF0033A0),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ],
@@ -232,10 +254,15 @@ class ChatScreenState extends State<ChatScreen> {
                       decoration: InputDecoration(
                         hintText: "Digite sua mensagem...",
                         border: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFF0033A0)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF0033A0),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFF0033A0), width: 2),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF0033A0),
+                            width: 2,
+                          ),
                         ),
                         hintStyle: const TextStyle(color: Colors.black),
                       ),
@@ -275,21 +302,22 @@ class ChatScreenState extends State<ChatScreen> {
         if (isDesktop) {
           return Scaffold(
             body: Row(
-              children: [
-                _buildSidebar(),
-                Expanded(child: _buildChatArea()),
-              ],
+              children: [_buildSidebar(), Expanded(child: _buildChatArea())],
             ),
           );
         } else {
           return Scaffold(
             appBar: AppBar(
-              title: const Text('EuroBot'),
+              title: Text(
+                'EuroBot',
+                style: GoogleFonts.kufam(fontWeight: FontWeight.w500),
+              ),
               backgroundColor: const Color(0xFF0033A0),
               foregroundColor: Colors.white,
             ),
             drawer: Drawer(child: _buildSidebar()),
             body: _buildChatArea(),
+            bottomNavigationBar: Footer(),
           );
         }
       },

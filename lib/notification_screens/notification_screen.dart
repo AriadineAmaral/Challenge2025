@@ -155,58 +155,60 @@ class _NotificacaoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(16),
-      height: 100,
-      decoration: BoxDecoration(
-        color: const Color(0xFF007BFF),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Stack(
-        children: [
-          // Texto principal
-          SizedBox(
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                texto,
-                style: GoogleFonts.kufam(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(16),
+        height: 100,
+        decoration: BoxDecoration(
+          color: const Color(0xFF007BFF),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Stack(
+          children: [
+            // Texto principal
+            SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  texto,
+                  style: GoogleFonts.kufam(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
-          ),
-
-          // Data no canto inferior direito
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Text(
-              data,
-              style: GoogleFonts.kufam(color: Colors.white70, fontSize: 12),
-            ),
-          ),
-
-          // Botão de fechar com efeito de toque
-          Positioned(
-            top: -15,
-            right: -15,
-            child: InkWell(
-              onTap: onRemover,
-              borderRadius: BorderRadius.circular(20), // Área de toque circular
-              splashColor: Color(0x4DFFFFFF), // Cor do efeito
-              highlightColor: Colors.transparent, // Sem cor de destaque
-              child: const Padding(
-                padding: EdgeInsets.all(14), // Área de toque maior
-                child: Icon(Icons.close, color: Colors.white, size: 18),
+      
+            // Data no canto inferior direito
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Text(
+                data,
+                style: GoogleFonts.kufam(color: Colors.white70, fontSize: 12),
               ),
             ),
-          ),
-        ],
+      
+            // Botão de fechar com efeito de toque
+            Positioned(
+              top: -15,
+              right: -15,
+              child: InkWell(
+                onTap: onRemover,
+                borderRadius: BorderRadius.circular(20), // Área de toque circular
+                splashColor: Color(0x4DFFFFFF), // Cor do efeito
+                highlightColor: Colors.transparent, // Sem cor de destaque
+                child: const Padding(
+                  padding: EdgeInsets.all(14), // Área de toque maior
+                  child: Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

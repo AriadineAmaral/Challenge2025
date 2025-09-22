@@ -74,7 +74,7 @@ class _ProjectClicState extends State<ProjectClic> {
                               text: TextSpan(
                                 children: [
                                   TextSpan(
-                                    text: 'Projeto ',
+                                    text: 'Ideia ',
                                     style: GoogleFonts.akatab(
                                       fontSize: 26,
                                       fontWeight: FontWeight.bold,

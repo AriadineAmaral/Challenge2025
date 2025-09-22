@@ -116,7 +116,7 @@ class Projects extends StatelessWidget {
                           ),
                           SizedBox(height: 16),
             
-                          // Card Projeto Clic
+                          // Card Ideia Clic
                           Card(
                             color: Colors.white,
                             shape: RoundedRectangleBorder(
@@ -129,7 +129,7 @@ class Projects extends StatelessWidget {
                               child: Column(
                                 children: [
                                   Text(
-                                    "Projeto Clic",
+                                    "Ideia Clic",
                                     style: GoogleFonts.akatab(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w800,
@@ -145,7 +145,7 @@ class Projects extends StatelessWidget {
                                       children: [
                                         TextSpan(
                                           text:
-                                              "O Projeto Clic busca ideias com foco em resultados tangíveis para a Eurofarma. "
+                                              "O Clic busca ideias com foco em resultados tangíveis para a Eurofarma. "
                                               "Se você tem uma solução que pode aumentar a produtividade, gerar retorno financeiro, "
                                               "reduzir custos ou promover a sustentabilidade, este é o lugar certo."
                                               "Pense em novas tecnologias, processos inovadores, otimização de recursos e estratégias "

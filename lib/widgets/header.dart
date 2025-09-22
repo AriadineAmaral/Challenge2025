@@ -21,44 +21,47 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height, 
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Row(
-        children: [
-          if(kIsWeb)
-          const SizedBox(width: 48),
-          if(!kIsWeb)
-          IconButton(
-            icon: Icon(backIcon, color: textColor),
-            onPressed: () {
-              if (destinoAoVoltar != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => destinoAoVoltar!),
-                );
-              } else {
-                Navigator.pop(context);
-              }
-            },
-          ),
-          Expanded(
-            child: Center(
-              child: Text(
-                titulo,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+    return SafeArea(
+      top: true,
+      child: Container(
+        height: height, 
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          children: [
+            if(kIsWeb)
+            const SizedBox(width: 48),
+            if(!kIsWeb)
+            IconButton(
+              icon: Icon(backIcon, color: textColor),
+              onPressed: () {
+                if (destinoAoVoltar != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => destinoAoVoltar!),
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  titulo,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 48),
-        ],
+            const SizedBox(width: 48),
+          ],
+        ),
       ),
     );
   }

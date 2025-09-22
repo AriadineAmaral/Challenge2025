@@ -38,7 +38,7 @@ class _MissionScreenState extends State<MissionScreen> {
     try {
       await Future.wait([_findMissoes(), _findColaboradorMissoes()]);
     } catch (e) {
-      // Trate erros se quiser
+      // Trate erros se necessário
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -65,44 +65,43 @@ class _MissionScreenState extends State<MissionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
-        surfaceTintColor: Color(0xFFF8F9FA),
+        surfaceTintColor: const Color(0xFFF8F9FA),
         elevation: 5,
         shadowColor: Colors.black,
         scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
       ),
       drawer: TitleAndDrawer(),
-      body: SingleChildScrollView(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Center(
-              child: Stack(
-                children: [
-                  ConstrainedBox(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SizedBox(
+            height: constraints.maxHeight,
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxWidth: kIsWeb ? 600 : constraints.maxWidth,
+                      minHeight: constraints.maxHeight,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                          child: Header(
-                            titulo: 'Missões do mês',
-                            destinoAoVoltar: RankingScreen(),
+                    child: Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                            child: Header(
+                              titulo: 'Missões do mês',
+                              destinoAoVoltar: RankingScreen(),
+                            ),
                           ),
-                        ),
-        
-                        Padding(
+                          Padding(
                             padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
                             child: ListView.builder(
                               shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
+                              physics: const NeverScrollableScrollPhysics(),
                               itemCount: missoes.length,
                               itemBuilder: (context, index) {
                                 final isConcluida = isMissaoConcluida(
@@ -126,8 +125,7 @@ class _MissionScreenState extends State<MissionScreen> {
                                             ? null
                                             : () async {
                                               final missao = missoes[index];
-        
-                                              // Se a missão tiver um link, abra o link
+      
                                               if (missao.link != null &&
                                                   missao.link!.isNotEmpty) {
                                                 final uri = Uri.parse(
@@ -144,7 +142,7 @@ class _MissionScreenState extends State<MissionScreen> {
                                                   ScaffoldMessenger.of(
                                                     context,
                                                   ).showSnackBar(
-                                                    SnackBar(
+                                                    const SnackBar(
                                                       content: Text(
                                                         'Não foi possível abrir o link',
                                                       ),
@@ -152,8 +150,7 @@ class _MissionScreenState extends State<MissionScreen> {
                                                   );
                                                 }
                                               }
-        
-                                              // Depois marca a missão como concluída normalmente
+      
                                               await missaoRepo.concluirMissao(
                                                 missao.idMissao,
                                                 missao.pontos,
@@ -166,9 +163,7 @@ class _MissionScreenState extends State<MissionScreen> {
                               },
                             ),
                           ),
-                        
-        
-                           Container(
+                          Container(
                             width: double.infinity,
                             margin: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -189,44 +184,30 @@ class _MissionScreenState extends State<MissionScreen> {
                               },
                             ),
                           ),
-                        
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                  if (isLoading)
-                    Container(
-                      color: const Color.fromRGBO(255, 255, 255, 0.7),
+                ),
+                if (isLoading)
+                  Positioned.fill(
+                    child: Container(
+                      color: const Color.fromRGBO(255, 255, 255, 0.8),
                       child: const Center(
                         child: CircularProgressIndicator(
                           color: Color(0xFF00358E),
                         ),
                       ),
                     ),
-                ],
-              ),
-            );
-          },
-        ),
+                  ),
+              ],
+            ),
+          );
+        },
       ),
       bottomNavigationBar: Footer(),
     );
   }
-}
-
-Widget _buildSimpleNavIcon({
-  required IconData icon,
-  required VoidCallback onPressed,
-}) {
-  return IconButton(
-    icon: Icon(icon, color: Colors.white),
-    iconSize: 25, // Tamanho fixo (ajuste conforme necessário)
-    padding: EdgeInsets.symmetric(
-      horizontal: 25,
-      vertical: 10,
-    ), // Espaçamento interno
-    constraints: BoxConstraints(), // Remove restrições de tamanho padrão
-    onPressed: onPressed,
-  );
 }
 
 class _MissaoItem extends StatelessWidget {
@@ -295,7 +276,7 @@ class _MissaoItem extends StatelessWidget {
             onPressed: onButtonPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: buttonColor,
-              minimumSize: const Size(100, 40), // <- Deixa o botão mais "gordo"
+              minimumSize: const Size(100, 40),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
               ),

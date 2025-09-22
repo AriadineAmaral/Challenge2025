@@ -8,49 +8,52 @@ class Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Container(
-            height: 50,
-            color: const Color(0xFF00358E),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildSimpleNavIcon(
-                  icon: Icons.notifications_none,
-                  onPressed:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationScreen(),
+    return SafeArea(
+      bottom: true,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Container(
+              height: 50,
+              color: const Color(0xFF00358E),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildSimpleNavIcon(
+                    icon: Icons.notifications_none,
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationScreen(),
+                          ),
                         ),
-                      ),
-                ),
-                _buildSimpleNavIcon(
-                  icon: Icons.home_outlined,
-                  onPressed:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const RankingScreen(),
+                  ),
+                  _buildSimpleNavIcon(
+                    icon: Icons.home_outlined,
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const RankingScreen(),
+                          ),
                         ),
-                      ),
-                ),
-                _buildSimpleNavIcon(
-                  icon: Icons.person_outline,
-                  onPressed:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const PerfilScreen()),
-                      ),
-                ),
-              ],
+                  ),
+                  _buildSimpleNavIcon(
+                    icon: Icons.person_outline,
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const PerfilScreen()),
+                        ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

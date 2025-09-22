@@ -18,6 +18,7 @@ class MyProjects extends StatefulWidget {
 }
 
 class _MeusProjetosScreenState extends State<MyProjects> {
+  
   final projetoRepo = RemoteProjetoRepository(client: Supabase.instance.client);
 
   List<Projeto> projetos = [];
@@ -187,7 +188,7 @@ class _ProjetoCard extends StatelessWidget {
                   projeto.tipoProjeto == 1
                       ? 'Projeto Kaizen'
                       : projeto.tipoProjeto == 2
-                      ? 'Projeto Clic'
+                      ? 'Ideia Clic'
                       : 'Projeto desconhecido',
                   style: GoogleFonts.akatab(
                     fontSize: 18,
