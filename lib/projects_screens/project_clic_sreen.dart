@@ -25,11 +25,14 @@ class _ProjectClicState extends State<ProjectClic> {
   final ProjectKaizenClicControllers _controllers =
       ProjectKaizenClicControllers();
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
+    final bool isLargeScreen = MediaQuery.of(context).size.width >= 1072;
+
     return Scaffold(
-     backgroundColor: Colors.white,
-      
+      backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -38,265 +41,311 @@ class _ProjectClicState extends State<ProjectClic> {
         shadowColor: Colors.black,
         scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
+        automaticallyImplyLeading: !isLargeScreen, // Remove ícone do drawer
       ),
-      drawer: TitleAndDrawer(),
+      drawer: isLargeScreen ? null : TitleAndDrawer(),
       body: LayoutBuilder(
         builder: (context, constraints) {
-         return Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: kIsWeb ? 600 : constraints.maxWidth),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if(!kIsWeb)
-                  // Cabeçalho com botão voltar e título
-                  Row(
-                    children: [
-                      
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProjectKaizenAndClicScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                         Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 45),
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 'Ideia ',
-                                    style: GoogleFonts.akatab(
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+          return Stack(
+            children: [
+              if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: kIsWeb ? 600 : constraints.maxWidth,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!kIsWeb)
+                          // Cabeçalho com botão voltar e título
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Colors.black,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              ProjectKaizenAndClicScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 45),
+                                  child: RichText(
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Projeto ',
+                                          style: GoogleFonts.akatab(
+                                            fontSize: 26,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Clic',
+                                          style: GoogleFonts.akatab(
+                                            fontSize: 26,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF00358E),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  TextSpan(
-                                    text: 'Clic',
-                                    style: GoogleFonts.akatab(
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF00358E),
+                                ),
+                              ),
+                            ],
+                          ),
+                        const SizedBox(height: 20),
+
+                        // Seção Título
+                        Text(
+                          'Título',
+                          style: GoogleFonts.akatab(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _controllers.tituloController,
+                          maxLength: 100,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            hintText: 'Escreva um título para a sua idéia',
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Seção Descrição
+                        Text(
+                          'Descrição',
+                          style: GoogleFonts.akatab(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${_controllers.descricaoController.text.length}/6000 caracteres',
+                          style: GoogleFonts.kufam(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Stack(
+                          children: [
+                            TextField(
+                              controller: _controllers.descricaoController,
+                              maxLength: 6000,
+                              maxLines: 8,
+                              onChanged: (_) => setState(() {}),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                hintText: 'Escreva detalhes da sua idéia...',
+                                contentPadding: const EdgeInsets.only(
+                                  bottom: 60,
+                                  left: 12,
+                                  right: 12,
+                                  top: 12,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 22,
+                              left: 8,
+                              right: 8,
+                              child: Row(
+                                children: [
+                                  // Botão Anexar Arquivo
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      icon: const Icon(
+                                        Icons.attach_file,
+                                        size: 20,
+                                      ),
+                                      label: const Text('Arquivos'),
+                                      onPressed: _pickFiles,
+                                      style: OutlinedButton.styleFrom(
+                                        alignment: Alignment.centerLeft,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // Botão Visualizar Arquivos
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      icon: const Icon(
+                                        Icons.visibility,
+                                        size: 20,
+                                      ),
+                                      label: Text(
+                                        'Visualizar (${_selectedFiles.length})',
+                                      ), // Removido replaceAll desnecessário
+                                      onPressed: _viewFiles,
+                                      style: OutlinedButton.styleFrom(
+                                        alignment: Alignment.centerLeft,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-              
-                  // Seção Título
-                  Text(
-                    'Título',
-                    style: GoogleFonts.akatab(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _controllers.tituloController,
-                    maxLength: 100,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      hintText: 'Escreva um título para a sua idéia',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-              
-                  // Seção Descrição
-                  Text(
-                    'Descrição',
-                    style: GoogleFonts.akatab(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${_controllers.descricaoController.text.length}/6000 caracteres',
-                    style: GoogleFonts.kufam(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 8),
-                  Stack(
-                    children: [
-                      TextField(
-                        controller: _controllers.descricaoController,
-                        maxLength: 6000,
-                        maxLines: 8,
-                        onChanged: (_) => setState(() {}),
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          hintText: 'Escreva detalhes da sua idéia...',
-                          contentPadding: const EdgeInsets.only(
-                            bottom: 60,
-                            left: 12,
-                            right: 12,
-                            top: 12,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 22,
-                        left: 8,
-                        right: 8,
-                        child: Row(
-                          children: [
-                            // Botão Anexar Arquivo
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                icon: const Icon(Icons.attach_file, size: 20),
-                                label: const Text('Arquivos'),
-                                onPressed: _pickFiles,
-                                style: OutlinedButton.styleFrom(
-                                  alignment: Alignment.centerLeft,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            // Botão Visualizar Arquivos
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                icon: const Icon(Icons.visibility, size: 20),
-                                label: Text(
-                                  'Visualizar (${_selectedFiles.length})',
-                                ), // Removido replaceAll desnecessário
-                                onPressed: _viewFiles,
-                                style: OutlinedButton.styleFrom(
-                                  alignment: Alignment.centerLeft,
-                                ),
-                              ),
-                            ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-              
-                  Button(
-                    text: 'Enviar',
-                    backgroundColor: Colors.yellow,
-                    textColor: Colors.black,
-                    isBold: true,
-                    
-                      onPressed: () async {
-                        final supabase = Supabase.instance.client;
-                        final projetoRepo = RemoteProjetoRepository(client: supabase);
-              
-                        final titulo = _controllers.tituloController.text;
-                        final descricao = _controllers.descricaoController.text;
-              
-                        if (titulo.isEmpty || descricao.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                '⚠️ Por favor, preencha todos os campos',
-                                style: TextStyle(color: Colors.black),
-                              ),
-                              backgroundColor: Color(0xFFFFF200),
-                            ),
-                          );
-                          return;
-                        }
-              
-                        try {
-                          final idProjeto = await projetoRepo.addProjeto(
-                            titulo,
-                            descricao,
-                            '2',
-                          );
-              
-                          for (final file in _selectedFiles) {
-                            final fileBytes = file.bytes;
-                            final fileName = sanitizeFileName(file.name);
-              
-                            if (fileBytes == null) {
-                              print('Arquivo ${file.name} sem bytes, ignorando...');
-                              continue;
-                            }
-              
-                            final storagePath = 'projetos/$idProjeto/$fileName';
-              
-                            print('Fazendo upload do arquivo: $fileName');
-              
-                            final response = await supabase.storage
-                                .from('arquivos')
-                                .uploadBinary(
-                                  storagePath,
-                                  fileBytes,
-                                  fileOptions: const FileOptions(upsert: true),
-                                );
-              
-                            print('Resposta do upload: $response');
-              
-                            if (response.isEmpty) {
-                              print('Erro: resposta do upload está vazia');
-                              continue;
-                            }
-              
-                            final publicUrl = supabase.storage
-                                .from('arquivos')
-                                .getPublicUrl(storagePath);
-              
-                            print('URL pública do arquivo: $publicUrl');
-              
-                            await supabase.from('arquivos').insert({
-                              'id_projeto': idProjeto,
-                              'nome_arquivo': fileName,
-                              'caminho': publicUrl,
+                        const SizedBox(height: 12),
+
+                        Button(
+                          text: 'Enviar',
+                          backgroundColor: Colors.yellow,
+                          textColor: Colors.black,
+                          onPressed: () async {
+                            setState(() {
+                              isLoading = true;
                             });
-                          }
-              
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Inscrição finalizada com sucesso!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-              
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MyProjects(),
-                            ),
-                          );
-                        } catch (e) {
-                          print('Erro no upload: $e');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Erro: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
+                            final supabase = Supabase.instance.client;
+                            final projetoRepo = RemoteProjetoRepository(
+                              client: supabase,
+                            );
+
+                            final titulo = _controllers.tituloController.text;
+                            final descricao =
+                                _controllers.descricaoController.text;
+
+                            if (titulo.isEmpty || descricao.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    '⚠️ Por favor, preencha todos os campos',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                  backgroundColor: Color(0xFFFFF200),
+                                ),
+                              );
+                              setState(() {
+                                isLoading = false;
+                              });
+                              return;
+                            }
+
+                            try {
+                              final idProjeto = await projetoRepo.addProjeto(
+                                titulo,
+                                descricao,
+                                '2',
+                              );
+
+                              for (final file in _selectedFiles) {
+                                final fileBytes = file.bytes;
+                                final fileName = sanitizeFileName(file.name);
+
+                                if (fileBytes == null) {
+                                  print(
+                                    'Arquivo ${file.name} sem bytes, ignorando...',
+                                  );
+                                  continue;
+                                }
+
+                                final storagePath =
+                                    'projetos/$idProjeto/$fileName';
+
+                                print('Fazendo upload do arquivo: $fileName');
+
+                                final response = await supabase.storage
+                                    .from('arquivos')
+                                    .uploadBinary(
+                                      storagePath,
+                                      fileBytes,
+                                      fileOptions: const FileOptions(
+                                        upsert: true,
+                                      ),
+                                    );
+
+                                print('Resposta do upload: $response');
+
+                                if (response.isEmpty) {
+                                  print('Erro: resposta do upload está vazia');
+                                  continue;
+                                }
+
+                                final publicUrl = supabase.storage
+                                    .from('arquivos')
+                                    .getPublicUrl(storagePath);
+
+                                print('URL pública do arquivo: $publicUrl');
+
+                                await supabase.from('arquivos').insert({
+                                  'id_projeto': idProjeto,
+                                  'nome_arquivo': fileName,
+                                  'caminho': publicUrl,
+                                });
+                              }
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Inscrição finalizada com sucesso!',
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MyProjects(),
+                                ),
+                              );
+                            } catch (e) {
+                              print('Erro no upload: $e');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Erro: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } finally {
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        );
-        }
+              if (isLoading)
+                Container(
+                  color: const Color.fromRGBO(255, 255, 255, 0.7),
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF00358E)),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
-       bottomNavigationBar: Footer(),
+      bottomNavigationBar: isLargeScreen ? null : Footer(),
     );
   }
 

@@ -53,9 +53,10 @@ class _MeusProjetosScreenState extends State<MyProjects> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLargeScreen = MediaQuery.of(context).size.width >= 1072;
+
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -64,72 +65,79 @@ class _MeusProjetosScreenState extends State<MyProjects> {
         shadowColor: Colors.black,
         scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
+        automaticallyImplyLeading: !isLargeScreen, // Remove ícone do drawer
       ),
-      drawer: TitleAndDrawer(),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-        return Center(
-          child: Stack(
-            children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.all(12.0),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: kIsWeb ? 600 : constraints.maxWidth),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                        child: Header(
-                          titulo: 'Meus projetos',
-                          destinoAoVoltar: RankingScreen(),
-                          backgroundColor: Colors.transparent,
-                          textColor: Colors.black,
-                          height: 30,
-                        ),
+      drawer: isLargeScreen ? null : TitleAndDrawer(),
+      body: Stack(
+        children: [
+          if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+          Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 600),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(12.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: kIsWeb ? 600 : constraints.maxWidth,
                       ),
-                      const SizedBox(height: 24),
-                  
-                      // Lista de projetos + a classe com os dados!!!
-                      ListView.separated(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: projetos.length,
-                        separatorBuilder:
-                            (context, index) => const Divider(height: 24),
-                        itemBuilder: (context, index) {
-                          final projeto = projetos[index];
-                          return _ProjetoCard(
-                            projeto: projeto,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => DetailProjects(projeto: projeto),
-                                ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                            child: Header(
+                              titulo: 'Meus projetos',
+                              destinoAoVoltar: RankingScreen(),
+                              backgroundColor: Colors.transparent,
+                              textColor: Colors.black,
+                              height: 30,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Lista de projetos + a classe com os dados!!!
+                          ListView.separated(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: projetos.length,
+                            separatorBuilder:
+                                (context, index) => const Divider(height: 24),
+                            itemBuilder: (context, index) {
+                              final projeto = projetos[index];
+                              return _ProjetoCard(
+                                projeto: projeto,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              DetailProjects(projeto: projeto),
+                                    ),
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-              if (isLoading)
-                Container(
-                  color: const Color.fromRGBO(255, 255, 255, 0.7),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF00358E)),
-                  ),
-                ),
-            ],
+            ),
           ),
-        );
-        }
+          if (isLoading)
+            Container(
+              color: const Color.fromRGBO(255, 255, 255, 0.7),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00358E)),
+              ),
+            ),
+        ],
       ),
-      bottomNavigationBar: Footer(),
+      bottomNavigationBar: isLargeScreen ? null : Footer(),
     );
   }
 }

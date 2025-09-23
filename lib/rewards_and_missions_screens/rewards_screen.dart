@@ -4,7 +4,6 @@ import 'package:europro/ranking_screens/ranking_sreen.dart';
 import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/header.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -93,162 +92,174 @@ class _RewardsScreenState extends State<RewardsScreen> {
       historicoPontuacao,
     );
 
+    final bool isLargeScreen = MediaQuery.of(context).size.width >= 1072;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 2,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
         shadowColor: Colors.black,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
+        automaticallyImplyLeading: !isLargeScreen, // Remove ícone do drawer
       ),
-      backgroundColor: Colors.white,
-      drawer: TitleAndDrawer(),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-        return Center(
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: kIsWeb ? 600 : constraints.maxWidth),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                        child: Header(
-                          titulo: 'Minha pontuação',
-                          destinoAoVoltar: RankingScreen(),
-                          backgroundColor: Colors.transparent,
-                          textColor: Colors.black,
-                          height: 30,
-                        ),
+      drawer: isLargeScreen ? null : TitleAndDrawer(),
+      body: Stack(
+        children: [
+          if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+          Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 600),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                      child: Header(
+                        titulo: 'Minha pontuação',
+                        destinoAoVoltar: RankingScreen(),
+                        backgroundColor: Colors.transparent,
+                        textColor: Colors.black,
+                        height: 30,
                       ),
-                  
-                      const SizedBox(height: 16),
-                  
-                      // Pontuação total
-                      Container(
-                        alignment: Alignment.center,
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF00358E),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.emoji_events, color: Colors.white, size: 50),
-                            SizedBox(width: 12),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Text(
-                                '$pontuacao',
-                                style: GoogleFonts.kufam(
-                                  color: Colors.white,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Pontuação total
+                    Container(
+                      alignment: Alignment.center,
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00358E),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.emoji_events,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                          SizedBox(width: 12),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              '$pontuacao',
+                              style: GoogleFonts.kufam(
+                                color: Colors.white,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Histórico de pontuação - Título
+                    Text(
+                      "Histórico de pontuação",
+                      style: GoogleFonts.akatab(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Lista de missões com scroll
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFF9E9E9E),
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
-                      ),
-                  
-                      const SizedBox(height: 16),
-                  
-                      // Histórico de pontuação - Título
-                      Text(
-                        "Histórico de pontuação",
-                        style: GoogleFonts.akatab(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                  
-                      const SizedBox(height: 12),
-                  
-                      // Lista de missões com scroll
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFF9E9E9E),
-                                blurRadius: 5,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Scrollbar(
-                            thumbVisibility: true,
-                            child: ListView.builder(
-                              itemCount: historicoFormatado.length,
-                              itemBuilder: (context, index) {
-                                final missao = historicoFormatado[index];
-                                final isNegative = missao["pontos"]!.contains('-');
-                  
-                                return Align(
-                                  alignment: Alignment.center,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 6),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '${missao["pontos"]} ${missao["descricao"]}',
-                                          style: GoogleFonts.kufam(
-                                            color:
-                                                isNegative
-                                                    ? Colors.red
-                                                    : const Color(0xFF007BFF),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        Text(
-                                          missao["expira"]!,
-                                          style: GoogleFonts.kufam(
-                                            color: Colors.grey,
-                                            fontSize: 12,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          child: ListView.builder(
+                            itemCount: historicoFormatado.length,
+                            itemBuilder: (context, index) {
+                              final missao = historicoFormatado[index];
+                              final isNegative = missao["pontos"]!.contains(
+                                '-',
+                              );
+
+                              return Align(
+                                alignment: Alignment.center,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 6,
                                   ),
-                                );
-                              },
-                            ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${missao["pontos"]} ${missao["descricao"]}',
+                                        style: GoogleFonts.kufam(
+                                          color:
+                                              isNegative
+                                                  ? Colors.red
+                                                  : const Color(0xFF007BFF),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      Text(
+                                        missao["expira"]!,
+                                        style: GoogleFonts.kufam(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              if (isLoading)
-                Container(
-                  color: const Color.fromRGBO(255, 255, 255, 0.7),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF00358E)),
-                  ),
-                ),
-            ],
+            ),
           ),
-        );
-        }
+          if (isLoading)
+            Container(
+              color: const Color.fromRGBO(255, 255, 255, 0.7),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00358E)),
+              ),
+            ),
+        ],
       ),
-      bottomNavigationBar: Footer(),
+      bottomNavigationBar: isLargeScreen ? null : Footer(),
     );
   }
 }

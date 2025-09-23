@@ -2,7 +2,7 @@ import 'package:europro/data/repository/remote_notificacao_repository.dart';
 import 'package:europro/domain/models/notificacao.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/ranking_screens/ranking_sreen.dart';
-import 'package:flutter/foundation.dart';
+import 'package:europro/widgets/title_and_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -48,96 +48,106 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLargeScreen = MediaQuery.of(context).size.width >= 1072;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Text(
-            'Notificações',
-            style: GoogleFonts.akatab(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
-          ),
-        ),
-        backgroundColor: const Color(0xFF00358E),
-        automaticallyImplyLeading: false,
-        leading: kIsWeb
-            ? null
-            :
-        IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RankingScreen()),
-            );
-          },
-        ),
+        backgroundColor: Colors.white,
+        surfaceTintColor: const Color(0xFFF8F9FA),
+        elevation: 5,
+        shadowColor: Colors.black,
+        scrolledUnderElevation: 2,
+        title: Image.asset('images/logoEuroPro.png', height: 30),
+        automaticallyImplyLeading: !isLargeScreen, // Remove ícone do drawer
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints){
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
+      drawer: isLargeScreen ? null : TitleAndDrawer(),
+      body: Stack(
+        children: [
+          if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+          Center(
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: kIsWeb ? 600 : constraints.maxWidth),
-              child: ListView.builder(
-                // Usamos ListView.builder para lista dinâmica
-                itemCount: notificacoes.length,
-                itemBuilder: (context, index) {
-                  return _NotificacaoItem(
-                    texto: notificacoes[index].conteudo,
-                    data:
-                        DateFormat(
-                          'dd/MM/yyyy',
-                        ).format(notificacoes[index].data).toString(),
-                    onRemover: () async {
-                       notificaocesRepo.deleteNotificacao(
-                        notificacoes[index].idNotificacao,
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return ListView.builder(
+                    // Usamos ListView.builder para lista dinâmica
+                    itemCount: notificacoes.length,
+                    itemBuilder: (context, index) {
+                      return _NotificacaoItem(
+                        texto: notificacoes[index].conteudo,
+                        data:
+                            DateFormat(
+                              'dd/MM/yyyy',
+                            ).format(notificacoes[index].data).toString(),
+                        onRemover: () async {
+                          notificaocesRepo.deleteNotificacao(
+                            notificacoes[index].idNotificacao,
+                          );
+                          _removerNotificacao(index);
+                        },
                       );
-                      _removerNotificacao(index);
                     },
                   );
                 },
               ),
             ),
           ),
-        );
-        }
+          if (isLoading)
+            Container(
+              color: const Color.fromRGBO(255, 255, 255, 0.7),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00358E)),
+              ),
+            ),
+        ],
       ),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: const Color(0xFF00358E),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.notifications_none, color: Colors.white),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.home_outlined, color: Colors.white),
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RankingScreen()),
-                  ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.person_outline, color: Colors.white),
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PerfilScreen()),
-                  ),
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar:
+          isLargeScreen
+              ? null
+              : Container(
+                height: 50,
+                color: const Color(0xFF00358E),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.notifications_none,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.home_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RankingScreen(),
+                            ),
+                          ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.person_outline,
+                        color: Colors.white,
+                      ),
+                      onPressed:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PerfilScreen(),
+                            ),
+                          ),
+                    ),
+                  ],
+                ),
+              ),
     );
   }
 }

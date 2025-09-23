@@ -7,7 +7,6 @@ import 'package:europro/widgets/button.dart';
 import 'package:europro/widgets/footer.dart';
 import 'package:europro/widgets/header.dart';
 import 'package:europro/widgets/title_and_drawer.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -63,6 +62,8 @@ class _MissionScreenState extends State<MissionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLargeScreen = MediaQuery.of(context).size.width >= 1072;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -73,102 +74,101 @@ class _MissionScreenState extends State<MissionScreen> {
         shadowColor: Colors.black,
         scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
+        automaticallyImplyLeading:
+            !isLargeScreen, // só mostra ícone se tela < 1072
       ),
-      drawer: TitleAndDrawer(),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SizedBox(
-            height: constraints.maxHeight,
-            child: Stack(
-              children: [
-                SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Center(
+      // Drawer só aparece em telas pequenas
+      drawer: isLargeScreen ? null : TitleAndDrawer(),
+      body: Stack(
+        children: [
+          if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+          Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 600),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(12.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 600),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                            padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                             child: Header(
                               titulo: 'Missões do mês',
                               destinoAoVoltar: RankingScreen(),
+                              backgroundColor: Colors.transparent,
+                              textColor: Colors.black,
+                              height: 30,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: missoes.length,
-                              itemBuilder: (context, index) {
-                                final isConcluida = isMissaoConcluida(
-                                  colaboradorMissoes,
-                                  missoes[index].idMissao,
-                                );
-                                return Padding(
-                                  padding: const EdgeInsets.all(4),
-                                  child: _MissaoItem(
-                                    title: missoes[index].titulo,
-                                    points:
-                                        'Ganhe ${missoes[index].pontos} pontos',
-                                    buttonLabel:
-                                        isConcluida ? 'concluída' : 'começar',
-                                    buttonColor:
-                                        isConcluida
-                                            ? const Color(0xFF979797)
-                                            : const Color(0xFF00358E),
-                                    onButtonPressed:
-                                        isConcluida
-                                            ? null
-                                            : () async {
-                                              final missao = missoes[index];
-      
-                                              if (missao.link != null &&
-                                                  missao.link!.isNotEmpty) {
-                                                final uri = Uri.parse(
-                                                  missao.link!,
-                                                );
-                                                if (await canLaunchUrl(uri)) {
-                                                  await launchUrl(
-                                                    uri,
-                                                    mode:
-                                                        LaunchMode
-                                                            .externalApplication,
-                                                  );
-                                                } else {
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text(
-                                                        'Não foi possível abrir o link',
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              }
-      
-                                              await missaoRepo.concluirMissao(
-                                                missao.idMissao,
-                                                missao.pontos,
+                          const SizedBox(height: 24),
+                          // Lista de missões
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: missoes.length,
+                            itemBuilder: (context, index) {
+                              final isConcluida = isMissaoConcluida(
+                                colaboradorMissoes,
+                                missoes[index].idMissao,
+                              );
+                              return Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: _MissaoItem(
+                                  title: missoes[index].titulo,
+                                  points:
+                                      'Ganhe ${missoes[index].pontos} pontos',
+                                  buttonLabel:
+                                      isConcluida ? 'concluída' : 'começar',
+                                  buttonColor:
+                                      isConcluida
+                                          ? const Color(0xFF979797)
+                                          : const Color(0xFF00358E),
+                                  onButtonPressed:
+                                      isConcluida
+                                          ? null
+                                          : () async {
+                                            final missao = missoes[index];
+                                            if (missao.link != null &&
+                                                missao.link!.isNotEmpty) {
+                                              final uri = Uri.parse(
+                                                missao.link!,
                                               );
-                                              await _findColaboradorMissoes();
-                                              if (mounted) setState(() {});
-                                            },
-                                  ),
-                                );
-                              },
-                            ),
+                                              if (await canLaunchUrl(uri)) {
+                                                await launchUrl(
+                                                  uri,
+                                                  mode:
+                                                      LaunchMode
+                                                          .externalApplication,
+                                                );
+                                              } else {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Não foi possível abrir o link',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                            await missaoRepo.concluirMissao(
+                                              missao.idMissao,
+                                              missao.pontos,
+                                            );
+                                            await _findColaboradorMissoes();
+                                            if (mounted) setState(() {});
+                                          },
+                                ),
+                              );
+                            },
                           ),
                           Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
                             child: Button(
                               text: 'Ver minha pontuação',
                               backgroundColor: Colors.yellow,
@@ -187,25 +187,25 @@ class _MissionScreenState extends State<MissionScreen> {
                         ],
                       ),
                     ),
-                  ),
-                ),
-                if (isLoading)
-                  Positioned.fill(
-                    child: Container(
-                      color: const Color.fromRGBO(255, 255, 255, 0.8),
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF00358E),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+                  );
+                },
+              ),
             ),
-          );
-        },
+          ),
+          if (isLoading)
+            Positioned.fill(
+              child: Container(
+                color: const Color.fromRGBO(255, 255, 255, 0.8),
+                child: const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF00358E)),
+                ),
+              ),
+            ),
+        ],
       ),
-      bottomNavigationBar: Footer(),
+
+      // Footer só em telas pequenas
+      bottomNavigationBar: isLargeScreen ? null : Footer(),
     );
   }
 }

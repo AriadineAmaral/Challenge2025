@@ -90,6 +90,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLargeScreen = MediaQuery.of(context).size.width >= 1072;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -100,37 +102,47 @@ class _PerfilScreenState extends State<PerfilScreen> {
         shadowColor: Colors.black,
         scrolledUnderElevation: 2,
         title: Image.asset('images/logoEuroPro.png', height: 30),
+        automaticallyImplyLeading: !isLargeScreen, // Remove ícone do drawer
       ),
-      drawer: TitleAndDrawer(),
-      body: LayoutBuilder(
-               builder: (context, constraints) {
-        return Center(
+      drawer: isLargeScreen ? null : TitleAndDrawer(),
+      body: Stack(
+        children: [
+          if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+          Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 600),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
                       child: Row(
                         children: [
-                          if(!kIsWeb)
-                          IconButton(
-                            icon: Icon(Icons.arrow_back_ios),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RankingScreen(),
-                                ),
-                              );
-                            },
-                          ),
+                          if (!kIsWeb)
+                            IconButton(
+                              icon: Icon(Icons.arrow_back_ios),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => RankingScreen(),
+                                  ),
+                                );
+                              },
+                            ),
                           Spacer(),
                         ],
                       ),
                     ),
                     SizedBox(height: 10),
                     ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: kIsWeb ? 600 : constraints.maxWidth),
+                      constraints: BoxConstraints(
+                        maxWidth:
+                            kIsWeb ? 600 : MediaQuery.of(context).size.width,
+                      ),
                       child: CircleAvatar(
                         radius: 80,
                         backgroundColor: Colors.grey[300],
@@ -146,7 +158,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                 : null,
                       ),
                     ),
-                
+
                     SizedBox(height: 8),
                     GestureDetector(
                       onTap: () => _editarFoto(context),
@@ -159,7 +171,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                         ),
                       ),
                     ),
-                
+
                     SizedBox(height: 8),
                     Text(
                       perfil?.nome ?? '',
@@ -174,8 +186,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     ),
                     SizedBox(height: 24),
                     SizedBox(
-                      width:
-                          300, 
+                      width: 300,
                       child: GridView.count(
                         crossAxisCount: 2,
                         shrinkWrap: true,
@@ -233,11 +244,19 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   ],
                 ),
               ),
-            );
-               }
+            ),
+          ),
+          if (isLoading)
+            Container(
+              color: const Color.fromRGBO(255, 255, 255, 0.7),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00358E)),
+              ),
+            ),
+        ],
       ),
-        bottomNavigationBar: Footer(),
-      );
+      bottomNavigationBar: isLargeScreen ? null : Footer(),
+    );
   }
 
   Widget _buildProfileButton(
@@ -257,18 +276,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 32,
-          ),
+          Icon(icon, color: Colors.white, size: 32),
           const SizedBox(height: 4),
           Text(
             text,
-            style: GoogleFonts.kufam(
-              color: Colors.white,
-              fontSize: 14,
-            ),
+            style: GoogleFonts.kufam(color: Colors.white, fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
@@ -282,7 +294,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }) {
     return IconButton(
       icon: Icon(icon, color: Colors.white),
-      iconSize: 25, 
+      iconSize: 25,
       padding: EdgeInsets.symmetric(
         horizontal: 25,
         vertical: 10,

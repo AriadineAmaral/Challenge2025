@@ -2,6 +2,7 @@
 import 'package:europro/chatbot_screen/eurobot_screen.dart';
 import 'package:europro/login_screens/login_screen.dart';
 import 'package:europro/mission_screens/missions_screen.dart';
+import 'package:europro/notification_screens/notification_screen.dart';
 import 'package:europro/perfil_screens/perfil_screen.dart';
 import 'package:europro/projects_screens/my_projects_screen.dart';
 import 'package:europro/projects_screens/project_kaizen_and_clic_screen.dart';
@@ -131,10 +132,12 @@ class _TitleAndDrawerState extends State<TitleAndDrawer> {
                               Positioned(
                                 left: 16,
                                 top: 16,
-                                child: IconButton(
-                                  icon: Icon(Icons.menu, color: Colors.black),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
+                                child: MediaQuery.of(context).size.width < 600
+                                    ? IconButton(
+                                        icon: Icon(Icons.menu, color: Colors.black),
+                                        onPressed: () => Navigator.pop(context),
+                                      )
+                                    : SizedBox.shrink(), // Não mostra o ícone em telas grandes
                               ),
                             ],
                           ),
@@ -250,7 +253,7 @@ class _TitleAndDrawerState extends State<TitleAndDrawer> {
                 ),Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: ListTile(
-                    leading: Icon(Icons.chat_bubble_outline_rounded),
+                    leading: Icon(Icons.smart_toy),
                     title: Text(
                       'EuroBot',
                       style: GoogleFonts.akatab(),
@@ -260,6 +263,24 @@ class _TitleAndDrawerState extends State<TitleAndDrawer> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChatScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: ListTile(
+                    leading: Icon(Icons.notifications_none),
+                    title: Text(
+                      'Notificações',
+                      style: GoogleFonts.akatab(),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationScreen(),
                         ),
                       );
                     },
