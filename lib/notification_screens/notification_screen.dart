@@ -71,24 +71,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
               constraints: const BoxConstraints(maxWidth: 600),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  return ListView.builder(
-                    // Usamos ListView.builder para lista dinâmica
-                    itemCount: notificacoes.length,
-                    itemBuilder: (context, index) {
-                      return _NotificacaoItem(
-                        texto: notificacoes[index].conteudo,
-                        data:
-                            DateFormat(
-                              'dd/MM/yyyy',
-                            ).format(notificacoes[index].data).toString(),
-                        onRemover: () async {
-                          notificaocesRepo.deleteNotificacao(
-                            notificacoes[index].idNotificacao,
-                          );
-                          _removerNotificacao(index);
-                        },
-                      );
-                    },
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: ListView.builder(
+                      // Usamos ListView.builder para lista dinâmica
+                      itemCount: notificacoes.length,
+                      itemBuilder: (context, index) {
+                        return _NotificacaoItem(
+                          texto: notificacoes[index].conteudo,
+                          data:
+                              DateFormat(
+                                'dd/MM/yyyy',
+                              ).format(notificacoes[index].data).toString(),
+                          onRemover: () async {
+                            notificaocesRepo.deleteNotificacao(
+                              notificacoes[index].idNotificacao,
+                            );
+                            _removerNotificacao(index);
+                          },
+                        );
+                      },
+                    ),
                   );
                 },
               ),
@@ -204,15 +207,15 @@ class _NotificacaoItem extends StatelessWidget {
       
             // Botão de fechar com efeito de toque
             Positioned(
-              top: -15,
-              right: -15,
+              top: -20,
+              right: -20,
               child: InkWell(
                 onTap: onRemover,
                 borderRadius: BorderRadius.circular(20), // Área de toque circular
                 splashColor: Color(0x4DFFFFFF), // Cor do efeito
                 highlightColor: Colors.transparent, // Sem cor de destaque
                 child: const Padding(
-                  padding: EdgeInsets.all(14), // Área de toque maior
+                  padding: EdgeInsets.all(16), // Área de toque maior
                   child: Icon(Icons.close, color: Colors.white, size: 18),
                 ),
               ),

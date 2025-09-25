@@ -196,6 +196,7 @@ class ChatScreenState extends State<ChatScreen> {
       child: Container(
         constraints: const BoxConstraints(maxWidth: 600),
         margin: const EdgeInsets.symmetric(horizontal: 16),
+        color: Colors.white, 
         child: Column(
           children: [
             if (_chatManager.showInitialScreen)
@@ -301,6 +302,7 @@ class ChatScreenState extends State<ChatScreen> {
 
         if (isDesktop) {
           return Scaffold(
+            backgroundColor: Colors.white, 
             body: Row(
               children: [_buildSidebar(), Expanded(child: _buildChatArea())],
             ),
