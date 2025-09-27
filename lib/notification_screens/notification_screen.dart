@@ -63,48 +63,51 @@ class _NotificationScreenState extends State<NotificationScreen> {
         automaticallyImplyLeading: !isLargeScreen, // Remove ícone do drawer
       ),
       drawer: isLargeScreen ? null : TitleAndDrawer(),
-      body: Stack(
-        children: [
-          if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ListView.builder(
-                      // Usamos ListView.builder para lista dinâmica
-                      itemCount: notificacoes.length,
-                      itemBuilder: (context, index) {
-                        return _NotificacaoItem(
-                          texto: notificacoes[index].conteudo,
-                          data:
-                              DateFormat(
-                                'dd/MM/yyyy',
-                              ).format(notificacoes[index].data).toString(),
-                          onRemover: () async {
-                            notificaocesRepo.deleteNotificacao(
-                              notificacoes[index].idNotificacao,
-                            );
-                            _removerNotificacao(index);
-                          },
-                        );
-                      },
-                    ),
-                  );
-                },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Stack(
+          children: [
+            if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ListView.builder(
+                        // Usamos ListView.builder para lista dinâmica
+                        itemCount: notificacoes.length,
+                        itemBuilder: (context, index) {
+                          return _NotificacaoItem(
+                            texto: notificacoes[index].conteudo,
+                            data:
+                                DateFormat(
+                                  'dd/MM/yyyy',
+                                ).format(notificacoes[index].data).toString(),
+                            onRemover: () async {
+                              notificaocesRepo.deleteNotificacao(
+                                notificacoes[index].idNotificacao,
+                              );
+                              _removerNotificacao(index);
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-          if (isLoading)
-            Container(
-              color: const Color.fromRGBO(255, 255, 255, 0.7),
-              child: const Center(
-                child: CircularProgressIndicator(color: Color(0xFF00358E)),
+            if (isLoading)
+              Container(
+                color: const Color.fromRGBO(255, 255, 255, 0.7),
+                child: const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF00358E)),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar:
           isLargeScreen
