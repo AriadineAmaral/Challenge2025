@@ -41,6 +41,4 @@ As regras de negócio e demais documentos estão disponíveis na pasta `document
 
 Para executar a aplicação localmente, siga o passo a passo enviado na entrega de sprint.
 
----
 
-Se quiser, posso te ajudar a escrever a seção de instalação com comandos ou instruções específicas. É só me dizer como está estruturado o projeto!
