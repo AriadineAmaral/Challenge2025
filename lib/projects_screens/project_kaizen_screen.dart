@@ -1,0 +1,635 @@
+import 'package:diacritic/diacritic.dart';
+import 'package:europro/data/repository/controller/project_kaizen_clic_controllers.dart';
+import 'package:europro/data/repository/remote_perfil_repository.dart';
+import 'package:europro/data/repository/remote_projeto_repository.dart';
+import 'package:europro/domain/models/Perfil.dart';
+import 'package:europro/projects_screens/my_projects_screen.dart';
+import 'package:europro/projects_screens/project_kaizen_and_clic_screen.dart';
+import 'package:europro/widgets/button.dart';
+import 'package:europro/widgets/footer.dart';
+import 'package:europro/widgets/title_and_drawer.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class ProjectKaizen extends StatefulWidget {
+  const ProjectKaizen({super.key});
+
+  @override
+  State<ProjectKaizen> createState() => _ProjectKaizenState();
+}
+
+class _ProjectKaizenState extends State<ProjectKaizen> {
+  final ProjectKaizenClicControllers _controllers =
+      ProjectKaizenClicControllers();
+
+  final List<PlatformFile> _selectedFiles = [];
+  bool isLoading = true;
+  List<Perfil> perfis = [];
+  List<Perfil> perfisFiltrados = [];
+  List<Perfil> participantesSelecionados = [];
+
+  final perfilRepo = RemotePerfilRepository(client: Supabase.instance.client);
+
+  @override
+  void initState() {
+    super.initState();
+    _listUsuarios();
+  }
+
+  void _listUsuarios() async {
+    final resultado = await perfilRepo.listUsuarios();
+    if (mounted) {
+      setState(() {
+        perfis = resultado;
+        perfisFiltrados = resultado;
+        isLoading = false;
+      });
+    }
+  }
+
+  void listColaboradores(String query) {
+    final resultado =
+        perfis.where((colab) {
+          final nome = colab.nome.toLowerCase();
+          final email = colab.email.toLowerCase(); // se existir
+          final termo = query.toLowerCase();
+          return nome.contains(termo) || email.contains(termo);
+        }).toList();
+
+    setState(() {
+      perfisFiltrados = resultado;
+    });
+  }
+
+  //_foundUsers
+  final TextEditingController _userSearchController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isLargeScreen = MediaQuery.of(context).size.width >= 1072;
+    final temTextoDigitado = _userSearchController.text.trim().isNotEmpty;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
+        shadowColor: Colors.black,
+        scrolledUnderElevation: 2,
+        title: Image.asset('images/logoEuroPro.png', height: 30),
+        automaticallyImplyLeading: !isLargeScreen, // Remove ícone do drawer
+      ),
+      drawer: isLargeScreen ? null : TitleAndDrawer(),
+      body: Stack(
+        children: [
+          if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: kIsWeb ? 600 : MediaQuery.of(context).size.width,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Cabeçalho com botão voltar e título
+                    Row(
+                      children: [
+                        if (!kIsWeb)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.black,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => ProjectKaizenAndClicScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 45),
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Projeto ',
+                                    style: GoogleFonts.akatab(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: 'Kaizen',
+                                    style: GoogleFonts.akatab(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(
+                                        0xFF00358E,
+                                      ), // Cor específica para Kaizen
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Seção Título
+                    Text(
+                      'Título',
+                      style: GoogleFonts.akatab(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _controllers.tituloController,
+                      maxLength: 100,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        hintText: 'Escreva um título para a sua idéia',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Campo de Adicionar Usuários
+                    Text(
+                      'Adicionar Participantes',
+                      style: GoogleFonts.akatab(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _userSearchController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        hintText: 'Digite o nome ou e-mail do participante',
+                        prefixIcon: Icon(Icons.person_add_alt_1),
+                      ),
+                      onChanged: (value) async {
+                        listColaboradores(value); // Chama a função de busca
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    if (temTextoDigitado && perfisFiltrados.isEmpty)
+                      Text('Nenhum colaborador encontrado.')
+                    else if (temTextoDigitado)
+                      SizedBox(
+                        height: 180,
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          child: ListView.builder(
+                            itemCount: perfisFiltrados.length,
+                            itemBuilder: (context, index) {
+                              final colaborador = perfisFiltrados[index];
+                              return ListTile(
+                                leading: Icon(Icons.person),
+                                title: Text(colaborador.nome),
+                                subtitle: Text(colaborador.email),
+                                onTap: () {
+                                  if (participantesSelecionados.length < 2 &&
+                                      !participantesSelecionados.contains(
+                                        colaborador,
+                                      )) {
+                                    setState(() {
+                                      participantesSelecionados.add(
+                                        colaborador,
+                                      );
+                                      _userSearchController.clear();
+                                      perfisFiltrados.clear();
+                                    });
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          '⚠️ Máximo de 2 participantes permitido',
+                                        ),
+                                        backgroundColor: Colors.orange,
+                                      ),
+                                    );
+                                  }
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+
+                    if (participantesSelecionados.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        'Participantes Selecionados:',
+                        style: GoogleFonts.akatab(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children:
+                            participantesSelecionados.map((perfil) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFE6F0FF),
+                                  border: Border.all(color: Color(0xFF00358E)),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      perfil.nome,
+                                      style: GoogleFonts.kufam(),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          participantesSelecionados.remove(
+                                            perfil,
+                                          );
+                                        });
+                                      },
+                                      child: Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.redAccent,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    // Seção Descrição
+                    Text(
+                      'Descrição',
+                      style: GoogleFonts.akatab(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${_controllers.descricaoController.text.length}/6000 caracteres',
+                      style: GoogleFonts.kufam(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Stack(
+                      children: [
+                        TextField(
+                          controller: _controllers.descricaoController,
+                          maxLength: 6000,
+                          maxLines: 8,
+                          onChanged: (_) => setState(() {}),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            hintText: 'Escreva detalhes da sua idéia...',
+                            contentPadding: const EdgeInsets.only(
+                              bottom: 60,
+                              left: 12,
+                              right: 12,
+                              top: 12,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 22,
+                          left: 8,
+                          right: 8,
+                          child: Row(
+                            children: [
+                              // Botão Anexar Arquivo
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  icon: const Icon(Icons.attach_file, size: 20),
+                                  label: const Text('Arquivos'),
+                                  onPressed: _pickFiles,
+                                  style: OutlinedButton.styleFrom(
+                                    alignment: Alignment.centerLeft,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              // Botão Visualizar Arquivos
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  icon: const Icon(Icons.visibility, size: 20),
+                                  label: Text(
+                                    'Visualizar (${_selectedFiles.length})',
+                                  ), // Removido replaceAll desnecessário
+                                  onPressed: _viewFiles,
+                                  style: OutlinedButton.styleFrom(
+                                    alignment: Alignment.centerLeft,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    Button(
+                      text: 'Enviar',
+                      backgroundColor: Colors.yellow,
+                      textColor: Colors.black,
+                      isBold: true,
+                      onPressed: () async {
+                        final supabase = Supabase.instance.client;
+                        final projetoRepo = RemoteProjetoRepository(
+                          client: supabase,
+                        );
+
+                        final titulo = _controllers.tituloController.text;
+                        final descricao = _controllers.descricaoController.text;
+
+                        if (titulo.isEmpty || descricao.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                '⚠️ Por favor, preencha todos os campos',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                              backgroundColor: Color(0xFFFFF200),
+                            ),
+                          );
+                          return;
+                        }
+
+                        try {
+                          final int idProjeto;
+
+                          if (participantesSelecionados.isNotEmpty) {
+                            List<int> idColaboradores = [];
+                            for (
+                              var i = 0;
+                              i < participantesSelecionados.length;
+                              i++
+                            ) {
+                              idColaboradores.add(
+                                participantesSelecionados[i].id,
+                              );
+                            }
+
+                            idProjeto = await projetoRepo.addProjeto(
+                              titulo,
+                              descricao,
+                              '1',
+                              idColaboradores: idColaboradores,
+                            );
+                          } else {
+                            idProjeto = await projetoRepo.addProjeto(
+                              titulo,
+                              descricao,
+                              '1',
+                            );
+                          }
+
+                          for (final file in _selectedFiles) {
+                            final fileBytes = file.bytes;
+                            final fileName = sanitizeFileName(file.name);
+
+                            if (fileBytes == null) {
+                              print(
+                                'Arquivo ${file.name} sem bytes, ignorando...',
+                              );
+                              continue;
+                            }
+
+                            final storagePath = 'projetos/$idProjeto/$fileName';
+
+                            print('Fazendo upload do arquivo: $fileName');
+
+                            final response = await supabase.storage
+                                .from('arquivos')
+                                .uploadBinary(
+                                  storagePath,
+                                  fileBytes,
+                                  fileOptions: const FileOptions(upsert: true),
+                                );
+
+                            print('Resposta do upload: $response');
+
+                            if (response.isEmpty) {
+                              print('Erro: resposta do upload está vazia');
+                              continue;
+                            }
+
+                            final publicUrl = supabase.storage
+                                .from('arquivos')
+                                .getPublicUrl(storagePath);
+
+                            print('URL pública do arquivo: $publicUrl');
+
+                            await supabase.from('arquivos').insert({
+                              'id_projeto': idProjeto,
+                              'nome_arquivo': fileName,
+                              'caminho': publicUrl,
+                            });
+                          }
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Inscrição finalizada com sucesso!',
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MyProjects(),
+                            ),
+                          );
+                        } catch (e) {
+                          print('Erro no upload: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Erro: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (isLoading)
+            Container(
+              color: const Color.fromRGBO(255, 255, 255, 0.7),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00358E)),
+              ),
+            ),
+        ],
+      ),
+      bottomNavigationBar: isLargeScreen ? null : Footer(),
+    );
+  }
+
+  Future<void> _pickFiles() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.any,
+      );
+
+      if (result != null) {
+        setState(() {
+          _selectedFiles.addAll(result.files);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao selecionar arquivos: $e')),
+      );
+    }
+  }
+
+  void _viewFiles() {
+    if (_selectedFiles.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Nenhum arquivo anexado')));
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Arquivos Anexados'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _selectedFiles.length,
+                itemBuilder: (context, index) {
+                  final file = _selectedFiles[index];
+                  return ListTile(
+                    leading: Icon(_getFileIcon(file)),
+                    title: Text(file.name),
+                    subtitle: Text(
+                      '${(file.size / 1024).toStringAsFixed(2)} KB',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _removeFile(index),
+                    ),
+                    onTap: () => _openFile(file),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Fechar'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  IconData _getFileIcon(PlatformFile file) {
+    final extension = file.extension?.toLowerCase();
+    if (extension == null) return Icons.insert_drive_file;
+
+    switch (extension) {
+      case 'pdf':
+        return Icons.picture_as_pdf;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return Icons.image;
+      case 'doc':
+      case 'docx':
+        return Icons.description;
+      case 'xls':
+      case 'xlsx':
+        return Icons.table_chart;
+      case 'mp4':
+      case 'mov':
+      case 'avi':
+        return Icons.videocam;
+      default:
+        return Icons.insert_drive_file;
+    }
+  }
+
+  Future<void> _openFile(PlatformFile file) async {
+    try {
+      // Adicione verificação de null safety
+      if (file.path != null) {
+        await OpenFilex.open(file.path!); // Adicionado ! para garantir não-nulo
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Arquivo sem caminho válido')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Não foi possível abrir o arquivo: $e')),
+      );
+    }
+  }
+
+  void _removeFile(int index) {
+    setState(() {
+      _selectedFiles.removeAt(index);
+    });
+  }
+
+  String sanitizeFileName(String fileName) {
+    final cleaned = removeDiacritics(fileName); // remove acentos como ã, ç, etc
+    return cleaned
+        .replaceAll(RegExp(r'[^\w\s.-]'), '') // remove parênteses, %, &, etc
+        .replaceAll(' ', '_') // troca espaços por underline
+        .trim(); // remove espaços do início/fim
+  }
+}

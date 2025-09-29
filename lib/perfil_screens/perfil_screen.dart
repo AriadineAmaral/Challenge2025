@@ -1,0 +1,585 @@
+import 'dart:io' show File;
+import 'dart:io';
+import 'package:europro/data/repository/controller/perfil_screen_controller.dart';
+import 'package:europro/data/repository/remote_colaborador_repository.dart';
+import 'package:europro/data/repository/remote_perfil_repository.dart';
+import 'package:europro/data/repository/remote_usuario_repository.dart';
+import 'package:europro/domain/models/Perfil.dart';
+import 'package:europro/projects_screens/my_projects_screen.dart';
+import 'package:europro/ranking_screens/ranking_sreen.dart';
+import 'package:europro/rewards_and_missions_screens/rewards_screen.dart';
+import 'package:europro/widgets/footer.dart';
+import 'package:europro/widgets/title_and_drawer.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class PerfilScreen extends StatefulWidget {
+  const PerfilScreen({super.key});
+
+  @override
+  State<PerfilScreen> createState() => _PerfilScreenState();
+}
+
+class _PerfilScreenState extends State<PerfilScreen> {
+  String? _fotoUrl;
+  bool isLoading = true;
+
+  final PerfilScreenController _controllers = PerfilScreenController();
+  final RemoteColaboradorRepository colaboradorRepo =
+      RemoteColaboradorRepository(client: Supabase.instance.client);
+  final RemotePerfilRepository perfilRepo = RemotePerfilRepository(
+    client: Supabase.instance.client,
+  );
+  Perfil? perfil;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarFotoPerfil();
+    _carregarPerfilUsuario();
+  }
+
+  Future<void> _carregarPerfilUsuario() async {
+    final resultado = await perfilRepo.perfilUsuario();
+    if (mounted) {
+      setState(() {
+        perfil = resultado;
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _carregarFotoPerfil() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      // 1. Buscar o ID do colaborador na tabela 'usuarios'
+      final usuario =
+          await Supabase.instance.client
+              .from('usuarios')
+              .select('id_colaborador')
+              .eq('user_id', user.id)
+              .maybeSingle();
+
+      if (usuario == null || usuario['id_colaborador'] == null) return;
+
+      final idColaborador = usuario['id_colaborador'];
+
+      // 2. Buscar a foto_url na tabela 'colaboradores'
+      final colaborador =
+          await Supabase.instance.client
+              .from('colaboradores')
+              .select('foto_url')
+              .eq('id_colaborador', idColaborador)
+              .maybeSingle();
+
+      if (colaborador != null && colaborador['foto_url'] != null) {
+        setState(() {
+          _fotoUrl =
+              '${colaborador['foto_url']}?v=${DateTime.now().millisecondsSinceEpoch}';
+        });
+      }
+    } catch (e) {
+      print('Erro ao carregar foto de perfil: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isLargeScreen = MediaQuery.of(context).size.width >= 1072;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Color(0xFFF8F9FA),
+        elevation: 5,
+        shadowColor: Colors.black,
+        scrolledUnderElevation: 2,
+        title: Image.asset('images/logoEuroPro.png', height: 30),
+        automaticallyImplyLeading: !isLargeScreen, // Remove ícone do drawer
+      ),
+      drawer: isLargeScreen ? null : TitleAndDrawer(),
+      body: Stack(
+        children: [
+          if (isLargeScreen) SizedBox(width: 250, child: TitleAndDrawer()),
+          Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 600),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          if (!kIsWeb)
+                            IconButton(
+                              icon: Icon(Icons.arrow_back_ios),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => RankingScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          Spacer(),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth:
+                            kIsWeb ? 600 : MediaQuery.of(context).size.width,
+                      ),
+                      child: CircleAvatar(
+                        radius: 80,
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage:
+                            _fotoUrl != null ? NetworkImage(_fotoUrl!) : null,
+                        child:
+                            _fotoUrl == null
+                                ? Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.white,
+                                )
+                                : null,
+                      ),
+                    ),
+
+                    SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () => _editarFoto(context),
+                      child: Text(
+                        'editar foto',
+                        style: GoogleFonts.kufam(
+                          color: Colors.black,
+                          fontSize: 14,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 8),
+                    Text(
+                      perfil?.nome ?? '',
+                      style: GoogleFonts.kufam(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      perfil?.email ?? '',
+                      style: GoogleFonts.kufam(color: Colors.black),
+                    ),
+                    SizedBox(height: 24),
+                    SizedBox(
+                      width: 300,
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 1.2,
+                        children: [
+                          _buildProfileButton(
+                            Icons.email_outlined,
+                            'alterar\nemail',
+                            () {
+                              _showAlterarEmailDialog(context);
+                            },
+                            context,
+                          ),
+                          _buildProfileButton(
+                            Icons.lock_reset_outlined,
+                            'redefinir\nsenha',
+                            () {
+                              _showRedefinirSenhaDialog(context);
+                            },
+                            context,
+                          ),
+                          _buildProfileButton(
+                            Icons.emoji_events_outlined,
+                            'minha\npontuação',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RewardsScreen(),
+                                ),
+                              );
+                            },
+                            context,
+                          ),
+                          _buildProfileButton(
+                            Icons.assignment_outlined,
+                            'meus\nprojetos',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MyProjects(),
+                                ),
+                              );
+                            },
+                            context,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (isLoading)
+            Container(
+              color: const Color.fromRGBO(255, 255, 255, 0.7),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00358E)),
+              ),
+            ),
+        ],
+      ),
+      bottomNavigationBar: isLargeScreen ? null : Footer(),
+    );
+  }
+
+  Widget _buildProfileButton(
+    IconData icon,
+    String text,
+    VoidCallback onTap,
+    BuildContext context,
+  ) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF00358E),
+        padding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        fixedSize: const Size(80, 60), // Limita o tamanho do botão
+      ),
+      onPressed: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.white, size: 32),
+          const SizedBox(height: 4),
+          Text(
+            text,
+            style: GoogleFonts.kufam(color: Colors.white, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleNavIcon({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return IconButton(
+      icon: Icon(icon, color: Colors.white),
+      iconSize: 25,
+      padding: EdgeInsets.symmetric(
+        horizontal: 25,
+        vertical: 10,
+      ), // Espaçamento interno
+      constraints: BoxConstraints(),
+      onPressed: onPressed,
+    );
+  }
+
+  //funcionalidade do botão de email
+  void _showAlterarEmailDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 24,
+          ), // Margem para telas pequenas
+          contentPadding: EdgeInsets.all(16),
+          titlePadding: EdgeInsets.only(left: 16, right: 8, top: 16),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Alterar email de cadastro', style: TextStyle(fontSize: 16)),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _controllers.emailAtualController,
+                  decoration: InputDecoration(
+                    labelText: 'Email atual',
+                    hintText: 'Informe o seu email atual',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _controllers.novoEmailController,
+                  decoration: InputDecoration(
+                    labelText: 'Novo email',
+                    hintText: 'Informe o novo email',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow,
+                    ),
+                    onPressed: () async {
+                      final emailAtual =
+                          _controllers.emailAtualController.text.trim();
+                      final novoEmail =
+                          _controllers.novoEmailController.text.trim();
+
+                      if (novoEmail.isEmpty || emailAtual.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              '⚠️ Por favor, preencha todos os campos',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Color(0xFFFFF200),
+                          ),
+                        );
+                        return;
+                      }
+
+                      // try {
+                      //   final usuarioRepo = RemoteUsuarioRepository(
+                      //     client: Supabase.instance.client,
+                      //   );
+
+                      //   await usuarioRepo.updateEmail(novoEmail, emailAtual);
+
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     const SnackBar(
+                      //       content: Text(
+                      //         'email alterado com sucesso',
+                      //         style: TextStyle(color: Colors.black),
+                      //       ),
+                      //       backgroundColor: Color(0xFF00923E),
+                      //     ),
+                      //   );
+                      //   Navigator.of(context).pop();
+                      // } catch (e) {
+                      //   String mensagemErro = e.toString().replaceAll(
+                      //     'Exception: ',
+                      //     '',
+                      //   );
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text(
+                      //         mensagemErro,
+                      //         style: TextStyle(color: Colors.white),
+                      //       ),
+                      //       backgroundColor: Colors.red,
+                      //     ),
+                      //   );
+                      // }
+                    },
+                    child: Text(
+                      'alterar',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  //funcionalidade do botão de senha
+  void _showRedefinirSenhaDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          contentPadding: EdgeInsets.all(16),
+          titlePadding: EdgeInsets.only(left: 16, right: 8, top: 16),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Redefinir a senha', style: TextStyle(fontSize: 16)),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _controllers.senhaAtualController,
+                  decoration: InputDecoration(
+                    labelText: 'Senha atual',
+                    hintText: 'Informe a sua senha atual',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _controllers.novaSenhaController,
+                  decoration: InputDecoration(
+                    labelText: 'Nova senha',
+                    hintText: 'Informe a sua nova senha',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _controllers.confirmarSenhaController,
+                  decoration: InputDecoration(
+                    labelText: 'Confirme a nova senha',
+                    hintText: 'Confirme a nova senha',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow,
+                    ),
+                    onPressed: () async {
+                      final novaSenha =
+                          _controllers.novaSenhaController.text.trim();
+                      final senhaAntiga =
+                          _controllers.senhaAtualController.text.trim();
+                      final confirmarSenha =
+                          _controllers.confirmarSenhaController.text.trim();
+
+                      if (confirmarSenha.isEmpty ||
+                          novaSenha.isEmpty ||
+                          senhaAntiga.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              '⚠️ Por favor, preencha todos os campos',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Color(0xFFFFF200),
+                          ),
+                        );
+                        return;
+                      }
+
+                      try {
+                        final usuarioRepo = RemoteUsuarioRepository(
+                          client: Supabase.instance.client,
+                        );
+
+                        await usuarioRepo.updateSenha(novaSenha, senhaAntiga);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Senha alterada com sucesso',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Color(0xFF00923E),
+                          ),
+                        );
+                        Navigator.of(context).pop();
+                      } catch (e) {
+                        String mensagemErro = e.toString().replaceAll(
+                          'Exception: ',
+                          '',
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              mensagemErro,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                    child: Text(
+                      'redefinir',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _editarFoto(BuildContext context) async {
+    final picker = ImagePicker();
+
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) return;
+
+    try {
+      String publicUrl;
+
+      if (kIsWeb) {
+        // Web: usa bytes direto lendo async
+        final bytes = await pickedFile.readAsBytes();
+        publicUrl = await colaboradorRepo.uploadFotoPerfil(bytes);
+      } else {
+        // Mobile: cria um File e passa para upload
+        final file = File(pickedFile.path);
+        publicUrl = await colaboradorRepo.uploadFotoPerfil(file);
+      }
+
+      await colaboradorRepo.atualizarFotoUrl(publicUrl);
+
+      setState(() {
+        _fotoUrl = publicUrl;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Foto atualizada com sucesso!')),
+      );
+    } catch (e, stackTrace) {
+      print('Erro ao atualizar foto: $e');
+      print(stackTrace);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao atualizar foto: $e')));
+    }
+  }
+}

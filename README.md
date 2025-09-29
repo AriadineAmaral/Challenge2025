@@ -40,5 +40,3 @@ As regras de negócio e demais documentos estão disponíveis na pasta `document
 ## ⚙️ Como Rodar o Projeto
 
 Para executar a aplicação localmente, siga o passo a passo enviado na entrega de sprint.
-
-

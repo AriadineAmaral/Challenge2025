@@ -1,0 +1,68 @@
+// lib/screens/login_screen.dart
+import 'package:europro/login_screens/access_screen.dart';
+import 'package:europro/login_screens/sign_up_screen.dart';
+import 'package:flutter/material.dart';
+import '../widgets/button.dart';
+
+class EuroProLoginScreen extends StatelessWidget {
+  const EuroProLoginScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+              child: Container(
+                width: 300,
+                height: 300,
+                child: Column(                
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('images/logoEuroPro.png', width: 250),
+                    const SizedBox(height: 60),
+                    Button(
+                      text: 'Acessar conta',
+                      backgroundColor: const Color(0xFFFFF200),
+                      textColor: Colors.black,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AccessScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Primeiro acesso?',
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Button(
+                      text: 'Criar conta',
+                      backgroundColor: const Color(0xFF00358E),
+                      textColor: Colors.white,
+                      isBold: true,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUpScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+          );
+        },
+      ),
+    );
+  }
+}
